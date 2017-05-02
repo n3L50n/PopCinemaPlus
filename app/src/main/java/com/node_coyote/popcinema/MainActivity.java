@@ -49,13 +49,13 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
         mRecyclerView.setAdapter(mAdapter);
 
-        loadMovieDate();
+        loadMovieData();
     }
 
     /**
      * A method to load movie data in the background
      */
-    private void loadMovieDate() {
+    private void loadMovieData() {
         new FetchMovieData().execute();
     }
 
@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         Class destination = MovieDetail.class;
         // Create a new intent
         Intent intent = new Intent(context, destination);
-        // TODO intent.putExtra(Intent.EXTRA_TEXT, movieData);
+        intent.putExtra(Intent.EXTRA_TEXT, movieData);
         startActivity(intent);
 
     }
@@ -88,7 +88,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
         @Override
         protected void onPostExecute(String[] movieData) {
+            //TODO remove after testing
+            String[] d = {"Furiosa", "Max", "Joe", "Bobo", "Dink", "Ted", "Cal", "Tex"};
 
+            movieData = d;
             if (movieData != null) {
                 mAdapter.setMovieData(movieData);
             }

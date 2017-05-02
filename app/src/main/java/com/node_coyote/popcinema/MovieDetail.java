@@ -23,12 +23,10 @@ public class MovieDetail extends AppCompatActivity {
 
         // If it's not empty, check if it has extra items. If so, set the text views and image view
         if (intent != null) {
-            //if (intent.hasExtra(Intent.EXTRA_TEXT)) {
-              //  mMovieTitle = intent.getStringExtra(Intent.EXTRA_TEXT);
-                //TODO remove after testing
-                mMovieTitle = "FURIOSA";
+            if (intent.hasExtra(Intent.EXTRA_TEXT)) {
+                mMovieTitle = intent.getStringExtra(Intent.EXTRA_TEXT);
                 mMovieTitleTextView.setText(mMovieTitle);
-            //}
+            }
         }
     }
 }
