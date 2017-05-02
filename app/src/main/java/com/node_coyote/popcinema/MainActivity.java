@@ -1,6 +1,7 @@
 package com.node_coyote.popcinema;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,7 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieAdapterOnClickHandler {
 
     /**
      * A variable to store the grids view recycler for the movie posters
@@ -40,11 +41,11 @@ public class MainActivity extends AppCompatActivity {
         Context context = MainActivity.this;
 
         // TODO user can set columns dynamically in menu. action_columns
-        int numberOfMovieColumns = 3;
+        int numberOfMovieColumns = 2;
         GridLayoutManager layoutManager = new GridLayoutManager(context, numberOfMovieColumns);
         mRecyclerView.setLayoutManager(layoutManager);
 
-        mAdapter = new MovieAdapter();
+        mAdapter = new MovieAdapter(this);
 
         mRecyclerView.setAdapter(mAdapter);
 
@@ -55,8 +56,21 @@ public class MainActivity extends AppCompatActivity {
      * A method to load movie data in the background
      */
     private void loadMovieDate() {
-        
         new FetchMovieData().execute();
+    }
+
+    @Override
+    public void onClick(String movieData) {
+
+        // Where the click is coming from
+        Context context = this;
+        // Where the click is going
+        Class destination = MovieDetail.class;
+        // Create a new intent
+        Intent intent = new Intent(context, destination);
+        // TODO intent.putExtra(Intent.EXTRA_TEXT, movieData);
+        startActivity(intent);
+
     }
 
     public class FetchMovieData extends AsyncTask<String, Void, String[]> {
@@ -73,8 +87,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(String[] strings) {
-            super.onPostExecute(strings);
+        protected void onPostExecute(String[] movieData) {
+
+            if (movieData != null) {
+                mAdapter.setMovieData(movieData);
+            }
         }
     }
 
@@ -103,4 +120,5 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+
 }

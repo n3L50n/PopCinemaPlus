@@ -4,10 +4,18 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/grid_movie_poster"
+    <TextView
+        android:id="@+id/grid_movie_title"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <ImageView
+        android:layout_gravity="center"
+        android:padding="8dp"
+        android:background="@color/colorAccentSecondary"
+        android:id="@+id/grid_movie_poster"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:contentDescription="@string/grid_movie_poster_content_description" />
 
 </LinearLayout>
