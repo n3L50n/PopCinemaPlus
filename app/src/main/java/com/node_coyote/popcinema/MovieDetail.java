@@ -1,8 +1,13 @@
 package com.node_coyote.popcinema;
 
-/**
- * Created by node_coyote on 5/1/17.
- */
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 
-public class MovieDetail  {
+public class MovieDetail extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_movie_detail);
+    }
 }
