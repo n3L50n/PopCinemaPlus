@@ -12,6 +12,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.node_coyote.popcinema.utility.Movie;
+import com.node_coyote.popcinema.utility.MovieJsonUtility;
+import com.node_coyote.popcinema.utility.NetworkUtility;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieAdapterOnClickHandler {
 
     /**
@@ -29,10 +38,14 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
      */
     private TextView mErrorDisplay;
 
+    private boolean mMovieDataLoaded;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mMovieDataLoaded = false;
 
         mRecyclerView = (RecyclerView) findViewById(R.id.movie_recycler_view);
         mRecyclerView.setHasFixedSize(true);
@@ -68,12 +81,11 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         Class destination = MovieDetail.class;
         // Create a new intent
         Intent intent = new Intent(context, destination);
-        intent.putExtra(Intent.EXTRA_TEXT, movieData);
         startActivity(intent);
 
     }
 
-    public class FetchMovieData extends AsyncTask<String, Void, String[]> {
+    public class FetchMovieData extends AsyncTask<String, Void, List<Movie>> {
 
         @Override
         protected void onPreExecute() {
@@ -82,18 +94,30 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         }
 
         @Override
-        protected String[] doInBackground(String... params) {
-            return new String[0];
+        protected List<Movie> doInBackground(String... params) {
+
+            URL popularMovieUrl = NetworkUtility.buildPopularMovieUrl();
+
+            try {
+                // By default, the app opens with Popular Movies. It is up to the user to toggle to top rated
+                String jsonPopularMovieResponse = NetworkUtility.getResponseFromHttp(popularMovieUrl);
+
+                List<Movie> data = MovieJsonUtility.getMovieStringsFromJson(MainActivity.this, jsonPopularMovieResponse);
+
+                return data;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
         }
 
         @Override
-        protected void onPostExecute(String[] movieData) {
-            //TODO remove after testing
-            String[] d = {"Furiosa", "Max", "Joe", "Bobo", "Dink", "Ted", "Cal", "Tex"};
+        protected void onPostExecute(List<Movie> movieData) {
 
-            movieData = d;
             if (movieData != null) {
                 mAdapter.setMovieData(movieData);
+                mMovieDataLoaded = true;
             }
         }
     }

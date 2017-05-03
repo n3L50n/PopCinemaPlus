@@ -9,13 +9,17 @@ import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.node_coyote.popcinema.utility.Movie;
+
+import java.util.List;
+
 /**
  * Created by node_coyote on 5/1/17.
  */
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHolder> {
 
-    private String[] mMovieData;
+    private List<Movie> mMovieData;
 
     private final MovieAdapterOnClickHandler mClickHandler;
 
@@ -41,7 +45,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
         @Override
         public void onClick(View view) {
             int adapterPosition = getAdapterPosition();
-            String movieData = mMovieData[adapterPosition];
+            String movieData = mMovieData.get(adapterPosition).getTitle();
             mClickHandler.onClick(movieData);
         }
     }
@@ -64,7 +68,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 
     @Override
     public void onBindViewHolder(MovieAdapterViewHolder holder, int position) {
-        String movie = mMovieData[position];
+
+        // Display Poster above Title for a grid item here. Good place to put the poster_path.
+        String movie = mMovieData.get(position).getTitle();
         holder.mGridMovieTitle.setText(movie);
     }
 
@@ -72,10 +78,10 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     public int getItemCount() {
         // Check for empty data to prevent crash
         if (mMovieData == null) return 0;
-        return mMovieData.length;
+        return mMovieData.size();
     }
 
-    public void setMovieData(String[] movieData) {
+    public void setMovieData(List<Movie> movieData) {
         mMovieData = movieData;
         notifyDataSetChanged();
     }

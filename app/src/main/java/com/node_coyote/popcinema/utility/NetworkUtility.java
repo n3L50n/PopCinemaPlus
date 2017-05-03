@@ -5,6 +5,7 @@ package com.node_coyote.popcinema.utility;
  */
 
 import android.net.Uri;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,27 +19,56 @@ import java.util.Scanner;
  */
 public class NetworkUtility {
 
-    private static final String MOVIE_BASE_URL = "http://image.tmdb.org/t/p/w185/";
+    private static final String MOVIE_BASE_URL = "https://api.themoviedb.org/3/movie/";
 
+    // The "key" part of the appended query parameter for the api key
     private static final String API_KEY = "api_key=";
 
+    // TODO REPLACE WITH API KEY FOR TESTING SO AS NOT TO COMMIT TO GITHUB
+    // The "value" part of the appended query parameter for the api key
     private static final String API_KEY_VALUE = "REPLACE WITH API KEY FOR TESTING SO AS NOT TO COMMIT TO GITHUB";
 
-    public static URL buildMovieUrl(String movieQuery) {
+    private static final String TOP_RATED = "top_rated";
 
-        Uri movieUri = Uri.parse(MOVIE_BASE_URL).buildUpon()
-                //TODO build out dynamic way to query
-                //.appendQueryParameter()
-                .appendQueryParameter(API_KEY, API_KEY_VALUE)
-                .build();
-        URL movieUrL = null;
+    private static final String POPULAR = "popular";
+
+    private static final String QUERY_PARAMETER = "?";
+
+    public static URL buildPopularMovieUrl() {
+
+        String u = MOVIE_BASE_URL
+                + POPULAR
+                + QUERY_PARAMETER
+                + API_KEY
+                + API_KEY_VALUE;
+
+        URL popularMovieUrL = null;
         try {
-            movieUrL = new URL(movieUri.toString());
+            popularMovieUrL = new URL(u);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
 
-        return movieUrL;
+        if (popularMovieUrL != null) {
+            Log.v("MOVIES", popularMovieUrL.toString());
+        }
+        return popularMovieUrL;
+    }
+
+    public static URL buildTopRatedMovieUrl(String movieQuery) {
+
+        Uri topRatedMovieUri = Uri.parse(MOVIE_BASE_URL).buildUpon()
+                .appendQueryParameter(TOP_RATED, QUERY_PARAMETER)
+                .appendQueryParameter(API_KEY, API_KEY_VALUE)
+                .build();
+        URL topRatedMovieUrL = null;
+        try {
+            topRatedMovieUrL = new URL(topRatedMovieUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        return topRatedMovieUrL;
     }
 
     public static String getResponseFromHttp(URL url) throws IOException {

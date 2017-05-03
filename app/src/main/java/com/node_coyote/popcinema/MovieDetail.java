@@ -9,6 +9,9 @@ public class MovieDetail extends AppCompatActivity {
 
     private String mMovieTitle;
     private TextView mMovieTitleTextView;
+    private TextView mMovieSummaryTextView;
+    private TextView mMovieReleaseTextView;
+    private TextView mMovieRatedTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,6 +20,10 @@ public class MovieDetail extends AppCompatActivity {
 
         // Find Movie Detail TextViews
         mMovieTitleTextView = (TextView) findViewById(R.id.movie_detail_title);
+        mMovieSummaryTextView = (TextView) findViewById(R.id.movie_detail_summary);
+        mMovieReleaseTextView = (TextView) findViewById(R.id.movie_detail_release_date);
+        mMovieRatedTextView = (TextView) findViewById(R.id.movie_detail_vote_average);
+
 
         // Get the intent from the grid item that was tapped
         Intent intent = getIntent();
