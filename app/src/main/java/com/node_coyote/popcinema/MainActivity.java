@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.node_coyote.popcinema.utility.Movie;
 import com.node_coyote.popcinema.utility.MovieJsonUtility;
 import com.node_coyote.popcinema.utility.NetworkUtility;
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.net.URL;
@@ -51,11 +52,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         mRecyclerView = (RecyclerView) findViewById(R.id.movie_recycler_view);
         mRecyclerView.setHasFixedSize(true);
 
-        //  Create a grid layout manager
         Context context = MainActivity.this;
 
         // TODO user can set columns dynamically in menu. action_columns
         int numberOfMovieColumns = 2;
+
+        //  Create a grid layout manager
         GridLayoutManager layoutManager = new GridLayoutManager(context, numberOfMovieColumns);
         mRecyclerView.setLayoutManager(layoutManager);
 
@@ -117,6 +119,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         @Override
         protected void onPostExecute(List<Movie> movieData) {
 
+            // TODO maybe here is okay for loading the posters. After we know the data is loaded?
             if (movieData != null) {
                 mAdapter.setMovieData(movieData);
                 mMovieDataLoaded = true;

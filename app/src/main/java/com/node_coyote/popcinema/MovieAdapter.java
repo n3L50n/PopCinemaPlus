@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.node_coyote.popcinema.utility.Movie;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -45,10 +46,12 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
         @Override
         public void onClick(View view) {
             int adapterPosition = getAdapterPosition();
-            //String[] d = new String[mMovieData.get(adapterPosition).getTitle()]{};
-            String[] movieData = {mMovieData.get(adapterPosition).getTitle(),
+            String[] movieData = {
+                    mMovieData.get(adapterPosition).getTitle(),
                     mMovieData.get(adapterPosition).getSummary(),
-                    mMovieData.get(adapterPosition).getRelease()};
+                    mMovieData.get(adapterPosition).getRelease(),
+                    mMovieData.get(adapterPosition).getPosterPath()
+            };
 
             mClickHandler.onClick(movieData);
         }
@@ -66,16 +69,20 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
         boolean attachToParentImmediately = false;
 
         View view = inflater.inflate(gridItemId, parent, attachToParentImmediately);
-
         return new MovieAdapterViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(MovieAdapterViewHolder holder, int position) {
 
-        // Display Poster above Title for a grid item here. Good place to put the poster_path.
+        // TODO Display Poster above Title for a grid item here. Could be good place to put the poster_path?
+
         String movie = mMovieData.get(position).getTitle();
+        String poster = mMovieData.get(position).getPosterPath();
+        //TODO load ^^^^ poster into .load("") Picasso
         holder.mGridMovieTitle.setText(movie);
+        String BASE = "http://image.tmdb.org/t/p/w185/";
+        Picasso.with(holder.mGridMoviePoster.getContext()).load(BASE + poster).into(holder.mGridMoviePoster);
     }
 
     @Override
