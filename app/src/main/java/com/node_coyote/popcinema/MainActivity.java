@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     private TextView mErrorDisplay;
 
     private boolean mMovieDataLoaded;
+    private List<Movie> mMovieData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     }
 
     @Override
-    public void onClick(String movieData) {
+    public void onClick(String[] movieData) {
 
         // Where the click is coming from
         Context context = this;
@@ -81,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         Class destination = MovieDetail.class;
         // Create a new intent
         Intent intent = new Intent(context, destination);
+        intent.putExtra(Intent.EXTRA_TEXT, movieData);
         startActivity(intent);
 
     }
@@ -89,8 +91,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
         @Override
         protected void onPreExecute() {
+            mMovieDataLoaded = false;
             super.onPreExecute();
-
         }
 
         @Override
@@ -102,9 +104,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                 // By default, the app opens with Popular Movies. It is up to the user to toggle to top rated
                 String jsonPopularMovieResponse = NetworkUtility.getResponseFromHttp(popularMovieUrl);
 
-                List<Movie> data = MovieJsonUtility.getMovieStringsFromJson(MainActivity.this, jsonPopularMovieResponse);
+                mMovieData = MovieJsonUtility.getMovieStringsFromJson(MainActivity.this, jsonPopularMovieResponse);
 
-                return data;
+                return mMovieData;
 
             } catch (Exception e) {
                 e.printStackTrace();

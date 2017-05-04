@@ -3,11 +3,11 @@ package com.node_coyote.popcinema;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
 public class MovieDetail extends AppCompatActivity {
 
-    private String mMovieTitle;
     private TextView mMovieTitleTextView;
     private TextView mMovieSummaryTextView;
     private TextView mMovieReleaseTextView;
@@ -31,8 +31,13 @@ public class MovieDetail extends AppCompatActivity {
         // If it's not empty, check if it has extra items. If so, set the text views and image view
         if (intent != null) {
             if (intent.hasExtra(Intent.EXTRA_TEXT)) {
-                mMovieTitle = intent.getStringExtra(Intent.EXTRA_TEXT);
-                mMovieTitleTextView.setText(mMovieTitle);
+                //mMovieTitle = intent.getStringExtra(Intent.EXTRA_TEXT);
+                String movieTitle = intent.getStringArrayExtra(Intent.EXTRA_TEXT)[0];
+                String movieSummary = intent.getStringArrayExtra(Intent.EXTRA_TEXT)[1];
+                String movieRelease = intent.getStringArrayExtra(Intent.EXTRA_TEXT)[2];
+                mMovieTitleTextView.setText(movieTitle);
+                mMovieSummaryTextView.setText(movieSummary);
+                mMovieReleaseTextView.setText(movieRelease);
             }
         }
     }
