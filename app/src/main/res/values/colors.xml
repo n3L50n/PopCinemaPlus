@@ -4,4 +4,9 @@
     <color name="colorPrimaryDark">#E64A19</color>
     <color name="colorAccent">#0091EA</color>
     <color name="colorAccentSecondary">#81D4FA</color>
+
+    <color name="grid_movie_title_color">@android:color/black</color>
+    <color name="detail_summary_text_color">@android:color/black</color>
+    <color name="movie_background">#EDEEEE</color>
+
 </resources>

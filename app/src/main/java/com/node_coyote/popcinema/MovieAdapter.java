@@ -75,14 +75,15 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     @Override
     public void onBindViewHolder(MovieAdapterViewHolder holder, int position) {
 
-        // TODO Display Poster above Title for a grid item here. Could be good place to put the poster_path?
-
+        // Set the views of the main page grid items with title and poster image.
         String movie = mMovieData.get(position).getTitle();
         String poster = mMovieData.get(position).getPosterPath();
-        //TODO load ^^^^ poster into .load("") Picasso
+
+        String posterBaseUrl = "http://image.tmdb.org/t/p/w342/";
+
+        Picasso.with(holder.mGridMoviePoster.getContext()).load(posterBaseUrl + poster).into(holder.mGridMoviePoster);
         holder.mGridMovieTitle.setText(movie);
-        String BASE = "http://image.tmdb.org/t/p/w185/";
-        Picasso.with(holder.mGridMoviePoster.getContext()).load(BASE + poster).into(holder.mGridMoviePoster);
+
     }
 
     @Override

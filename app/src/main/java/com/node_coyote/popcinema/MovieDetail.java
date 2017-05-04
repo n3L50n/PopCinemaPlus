@@ -44,7 +44,7 @@ public class MovieDetail extends AppCompatActivity {
                 mMovieTitleTextView.setText(movieTitle);
                 mMovieSummaryTextView.setText(movieSummary);
                 mMovieReleaseTextView.setText(movieRelease);
-                String BASE = "http://image.tmdb.org/t/p/w185/";
+                String BASE = "http://image.tmdb.org/t/p/w342/";
 
                 Picasso.with(mMoviePosterView.getContext()).load( BASE + moviePoster).into(mMoviePosterView);
             }
