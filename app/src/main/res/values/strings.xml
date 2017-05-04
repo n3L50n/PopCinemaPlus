@@ -3,4 +3,7 @@
     <string name="menu_title_popular">Popular</string>
     <string name="menu_title_top_rated">Top Rated</string>
     <string name="grid_movie_poster_content_description">An image of a movie poster</string>
+    <string name="empty_movie_content_description">An image to display when there are no movies.</string>
+    <string name="empty_text_message">No Movies, huh?</string>
+    <string name="empty_text_message_subtext">Perhaps check the internet connection?</string>
 </resources>

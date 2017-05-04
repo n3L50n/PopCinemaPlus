@@ -2,6 +2,7 @@ package com.node_coyote.popcinema;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import com.node_coyote.popcinema.utility.Movie;
@@ -37,9 +39,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     /**
      * An error to display if not connected to the internet
      */
-    private TextView mErrorDisplay;
+    private TextView mEmptyDisplay;
+    private TextView mEmptyDisplaySubtext;
 
-    private boolean mMovieDataLoaded;
     private List<Movie> mMovieData;
 
     @Override
@@ -47,14 +49,17 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mMovieDataLoaded = false;
+        mEmptyDisplay = (TextView) findViewById(R.id.empty_screen_display);
+        mEmptyDisplay.setVisibility(View.VISIBLE);
+
+        mEmptyDisplaySubtext = (TextView) findViewById(R.id.empty_screen_display_subtext);
+        mEmptyDisplaySubtext.setVisibility(View.VISIBLE);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.movie_recycler_view);
         mRecyclerView.setHasFixedSize(true);
 
         Context context = MainActivity.this;
 
-        // TODO user can set columns dynamically in menu. action_columns
         int numberOfMovieColumns = 2;
 
         //  Create a grid layout manager
@@ -93,7 +98,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
         @Override
         protected void onPreExecute() {
-            mMovieDataLoaded = false;
             super.onPreExecute();
         }
 
@@ -119,10 +123,11 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         @Override
         protected void onPostExecute(List<Movie> movieData) {
 
-            // TODO maybe here is okay for loading the posters. After we know the data is loaded?
             if (movieData != null) {
                 mAdapter.setMovieData(movieData);
-                mMovieDataLoaded = true;
+                mEmptyDisplay.setVisibility(View.INVISIBLE);
+                mEmptyDisplaySubtext.setVisibility(View.INVISIBLE);
+                mRecyclerView.setVisibility(View.VISIBLE);
             }
         }
     }
@@ -142,15 +147,60 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
         switch (id) {
             case R.id.action_popular:
-                // Sort by popularity
+                // Fetch a sort by popularity
+                loadMovieData();
                 return true;
             case R.id.action_top_rated:
-                // Sort by top rated
+                // Fetch a sort by top rated
+                loadTopRated();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
 
         }
+    }
+
+    public void loadTopRated() {
+        new FetchTopRatedMovieData().execute();
+    }
+
+    public class FetchTopRatedMovieData extends AsyncTask<String, Void, List<Movie>> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected List<Movie> doInBackground(String... params) {
+
+            URL topRatedMovieUrl = NetworkUtility.buildTopRatedMovieUrl();
+
+            try {
+                // By default, the app opens with Popular Movies. It is up to the user to toggle to top rated
+                String jsonPopularMovieResponse = NetworkUtility.getResponseFromHttp(topRatedMovieUrl);
+
+                mMovieData = MovieJsonUtility.getMovieStringsFromJson(MainActivity.this, jsonPopularMovieResponse);
+
+                return mMovieData;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(List<Movie> movieData) {
+
+            if (movieData != null) {
+                mAdapter.setMovieData(movieData);
+                mEmptyDisplay.setVisibility(View.INVISIBLE);
+                mEmptyDisplaySubtext.setVisibility(View.INVISIBLE);
+                mRecyclerView.setVisibility(View.VISIBLE);
+            }
+        }
+
     }
 
 }

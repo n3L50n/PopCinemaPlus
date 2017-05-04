@@ -55,19 +55,24 @@ public class NetworkUtility {
         return popularMovieUrL;
     }
 
-    public static URL buildTopRatedMovieUrl(String movieQuery) {
+    public static URL buildTopRatedMovieUrl() {
 
-        Uri topRatedMovieUri = Uri.parse(MOVIE_BASE_URL).buildUpon()
-                .appendQueryParameter(TOP_RATED, QUERY_PARAMETER)
-                .appendQueryParameter(API_KEY, API_KEY_VALUE)
-                .build();
+        String builtUrl = MOVIE_BASE_URL
+                + TOP_RATED
+                + QUERY_PARAMETER
+                + API_KEY
+                + API_KEY_VALUE;
+
         URL topRatedMovieUrL = null;
         try {
-            topRatedMovieUrL = new URL(topRatedMovieUri.toString());
+            topRatedMovieUrL = new URL(builtUrl);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
 
+        if (topRatedMovieUrL != null) {
+            Log.v("MOVIES", topRatedMovieUrL.toString());
+        }
         return topRatedMovieUrL;
     }
 
