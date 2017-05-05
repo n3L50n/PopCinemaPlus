@@ -8,48 +8,39 @@
 
     <TextView
         android:id="@+id/movie_detail_title"
-        android:paddingTop="16dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/colorPrimaryDark"
-        android:textSize="33sp"
-        tools:text="Movie Title" />
+        style="@style/DetailTitleStyle" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:background="@color/colorAccentSecondary" />
 
     <TextView
         android:id="@+id/movie_detail_summary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/detail_summary_text_color"
-        android:padding="16dp"
-        tools:text="Movie Summary.Movie Summary. Movie Summary.Movie Summary.Movie Summary.Movie Summary.Movie Summary.Movie Summary.Movie Summary.Movie Summary.Movie Summary.Movie Summary.Movie Summary.Movie Summary.Movie Summary.Movie Summary.Movie Summary.Movie Summary.Movie Summary.Movie Summary.Movie Summary." />
+        style="@style/DetailSummaryStyle" />
 
     <TextView
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
         android:id="@+id/movie_detail_release_date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="April 2017" />
+        style="@style/DetailReleaseStyle" />
 
     <TextView
         android:id="@+id/movie_detail_vote_average"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        style="@style/DetailRatingStyle" />
 
     <View
-        android:background="@color/colorAccentSecondary"
         android:layout_width="match_parent"
-        android:layout_height="1dp" />
+        android:layout_height="1dp"
+        android:background="@color/colorAccentSecondary" />
 
     <ImageView
-        android:background="@color/movie_background"
         android:id="@+id/movie_detail_poster_image_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
-        android:padding="16dp"
-        android:contentDescription="@string/grid_movie_poster_content_description" />
+        android:background="@color/movie_background"
+        android:contentDescription="@string/grid_movie_poster_content_description"
+        android:padding="16dp" />
 
 </LinearLayout>

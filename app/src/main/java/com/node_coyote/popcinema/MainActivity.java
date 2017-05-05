@@ -2,7 +2,6 @@ package com.node_coyote.popcinema;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,11 +16,8 @@ import android.widget.TextView;
 import com.node_coyote.popcinema.utility.Movie;
 import com.node_coyote.popcinema.utility.MovieJsonUtility;
 import com.node_coyote.popcinema.utility.NetworkUtility;
-import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieAdapterOnClickHandler {
@@ -37,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     private MovieAdapter mAdapter;
 
     /**
-     * An error to display if not connected to the internet
+     * Use to display text if not connected to the internet
      */
     private TextView mEmptyDisplay;
     private TextView mEmptyDisplaySubtext;
@@ -94,6 +90,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     }
 
+    /**
+     * Class to help move the popular request off the main thread
+     */
     public class FetchMovieData extends AsyncTask<String, Void, List<Movie>> {
 
         @Override
@@ -164,6 +163,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         new FetchTopRatedMovieData().execute();
     }
 
+    /**
+     * Class to help move the top rated request off the main thread
+     */
     public class FetchTopRatedMovieData extends AsyncTask<String, Void, List<Movie>> {
 
         @Override

@@ -4,7 +4,6 @@ package com.node_coyote.popcinema.utility;
  * Created by node_coyote on 5/1/17.
  */
 
-import android.net.Uri;
 import android.util.Log;
 
 import java.io.IOException;
@@ -19,24 +18,31 @@ import java.util.Scanner;
  */
 public class NetworkUtility {
 
+    // The base url to fetch movies from.
     private static final String MOVIE_BASE_URL = "https://api.themoviedb.org/3/movie/";
 
     // The "key" part of the appended query parameter for the api key
     private static final String API_KEY = "api_key=";
 
-    // TODO REPLACE WITH API KEY FOR TESTING SO AS NOT TO COMMIT TO GITHUB
     // The "value" part of the appended query parameter for the api key
     private static final String API_KEY_VALUE = "REPLACE WITH API KEY FOR TESTING SO AS NOT TO COMMIT TO GITHUB";
 
+    // Use top rated to call the top rated sort
     private static final String TOP_RATED = "top_rated";
 
+    // Use popular to call the popular sort.
     private static final String POPULAR = "popular";
 
+    // add to the end of top rated or popular
     private static final String QUERY_PARAMETER = "?";
 
+    /**
+     * A method that returns a movie url with the popular movies tagged
+     * @return a url with an api key appended
+     */
     public static URL buildPopularMovieUrl() {
 
-        String u = MOVIE_BASE_URL
+        String builtUrl = MOVIE_BASE_URL
                 + POPULAR
                 + QUERY_PARAMETER
                 + API_KEY
@@ -44,7 +50,7 @@ public class NetworkUtility {
 
         URL popularMovieUrL = null;
         try {
-            popularMovieUrL = new URL(u);
+            popularMovieUrL = new URL(builtUrl);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -55,6 +61,10 @@ public class NetworkUtility {
         return popularMovieUrL;
     }
 
+    /**
+     * A method that returns a url with the top rated movies tagged
+     * @return
+     */
     public static URL buildTopRatedMovieUrl() {
 
         String builtUrl = MOVIE_BASE_URL
@@ -76,6 +86,12 @@ public class NetworkUtility {
         return topRatedMovieUrL;
     }
 
+    /**
+     * A helper method
+     * @param url Takes a url built to specifications
+     * @return 
+     * @throws IOException Check for problems
+     */
     public static String getResponseFromHttp(URL url) throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         try {

@@ -11,25 +11,17 @@ import com.squareup.picasso.Picasso;
 
 public class MovieDetail extends AppCompatActivity {
 
-    private TextView mMovieTitleTextView;
-    private TextView mMovieSummaryTextView;
-    private TextView mMovieReleaseTextView;
-    //TODO fx all this
-    private TextView mMovieRatedTextView;
-    private ImageView mMoviePosterView;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
 
         // Find Movie Detail TextViews
-        mMovieTitleTextView = (TextView) findViewById(R.id.movie_detail_title);
-        mMovieSummaryTextView = (TextView) findViewById(R.id.movie_detail_summary);
-        mMovieReleaseTextView = (TextView) findViewById(R.id.movie_detail_release_date);
-        mMovieRatedTextView = (TextView) findViewById(R.id.movie_detail_vote_average);
-        mMoviePosterView = (ImageView) findViewById(R.id.movie_detail_poster_image_view);
-
+        TextView movieTitleTextView = (TextView) findViewById(R.id.movie_detail_title);
+        TextView movieSummaryTextView = (TextView) findViewById(R.id.movie_detail_summary);
+        TextView movieReleaseTextView = (TextView) findViewById(R.id.movie_detail_release_date);
+        TextView movieRatedTextView = (TextView) findViewById(R.id.movie_detail_vote_average);
+        ImageView moviePosterView = (ImageView) findViewById(R.id.movie_detail_poster_image_view);
 
         // Get the intent from the grid item that was tapped
         Intent intent = getIntent();
@@ -41,12 +33,18 @@ public class MovieDetail extends AppCompatActivity {
                 String movieSummary = intent.getStringArrayExtra(Intent.EXTRA_TEXT)[1];
                 String movieRelease = intent.getStringArrayExtra(Intent.EXTRA_TEXT)[2];
                 String moviePoster = intent.getStringArrayExtra(Intent.EXTRA_TEXT)[3];
-                mMovieTitleTextView.setText(movieTitle);
-                mMovieSummaryTextView.setText(movieSummary);
-                mMovieReleaseTextView.setText(movieRelease);
-                String BASE = "http://image.tmdb.org/t/p/w342/";
+                String movieRating = intent.getStringArrayExtra(Intent.EXTRA_TEXT)[4];
+                String release = getString(R.string.released_on_text) + " " + movieRelease;
+                String rated = getString(R.string.rated_text) + " " + movieRating;
 
-                Picasso.with(mMoviePosterView.getContext()).load( BASE + moviePoster).into(mMoviePosterView);
+                movieTitleTextView.setText(movieTitle);
+                movieSummaryTextView.setText(movieSummary);
+                movieReleaseTextView.setText(release);
+                movieRatedTextView.setText(rated);
+
+                String baseImageUrl = "http://image.tmdb.org/t/p/w342/";
+
+                Picasso.with(moviePosterView.getContext()).load(baseImageUrl + moviePoster).into(moviePosterView);
             }
         }
     }

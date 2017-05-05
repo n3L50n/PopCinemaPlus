@@ -13,15 +13,13 @@ public class Movie {
     private String mSummary;
     private String mTitle;
     private String mRelease;
-    private double mPopularity;
     private double mTopRated;
 
-    public Movie(String poster, String summary, String title, String release, double popularity, double topRated) {
+    public Movie(String poster, String summary, String title, String release, double topRated) {
         mPosterPath = poster;
         mSummary = summary;
         mTitle = title;
         mRelease = release;
-        mPopularity = popularity;
         mTopRated = topRated;
     }
 
@@ -41,11 +39,8 @@ public class Movie {
         return mRelease;
     }
 
-    public double getPopularity(){
-        return mPopularity;
-    }
-
-    public double getTopRated(){
-        return mTopRated;
+    public String getTopRated(){
+        String rated = String.valueOf(mTopRated);
+        return rated;
     }
 }

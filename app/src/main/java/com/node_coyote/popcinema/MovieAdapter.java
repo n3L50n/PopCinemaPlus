@@ -46,11 +46,13 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
         @Override
         public void onClick(View view) {
             int adapterPosition = getAdapterPosition();
+
             String[] movieData = {
                     mMovieData.get(adapterPosition).getTitle(),
                     mMovieData.get(adapterPosition).getSummary(),
                     mMovieData.get(adapterPosition).getRelease(),
-                    mMovieData.get(adapterPosition).getPosterPath()
+                    mMovieData.get(adapterPosition).getPosterPath(),
+                    mMovieData.get(adapterPosition).getTopRated()
             };
 
             mClickHandler.onClick(movieData);

@@ -25,7 +25,6 @@ public final class MovieJsonUtility {
         final String POSTER_PATH = "poster_path";
         final String OVERVIEW = "overview";
         final String TITLE = "original_title";
-        final String POPULARITY = "popularity";
         final String TOP_RATED = "vote_average";
         final String RELEASE_DATE = "release_date";
 
@@ -45,10 +44,9 @@ public final class MovieJsonUtility {
                 String summary = movie.getString(OVERVIEW);
                 String title = movie.getString(TITLE);
                 String release = movie.getString(RELEASE_DATE);
-                double popularity = movie.getDouble(POPULARITY);
                 double topRated = movie.getDouble(TOP_RATED);
 
-                Movie newMovie = new Movie(poster, summary, title, release, popularity, topRated);
+                Movie newMovie = new Movie(poster, summary, title, release, topRated);
                 parsedMovies.add(newMovie);
             }
 
