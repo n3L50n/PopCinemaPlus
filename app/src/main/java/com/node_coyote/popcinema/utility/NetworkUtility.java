@@ -92,9 +92,11 @@ public class NetworkUtility {
         return topRatedMovieUrL;
     }
 
-    public static URL buildVideoDatasetUrl() {
+    public static URL buildVideoDatasetUrl(String movieId) {
 
         String builtUrl = MOVIE_BASE_URL
+                + movieId
+                + "/"
                 + VIDEOS
                 // + MOVIE_ID
                 + QUERY_PARAMETER

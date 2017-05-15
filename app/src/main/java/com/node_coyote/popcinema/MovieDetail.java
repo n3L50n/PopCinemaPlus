@@ -7,6 +7,8 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.node_coyote.popcinema.utility.MovieJsonUtility;
+import com.node_coyote.popcinema.utility.NetworkUtility;
 import com.squareup.picasso.Picasso;
 
 public class MovieDetail extends AppCompatActivity {
@@ -23,6 +25,8 @@ public class MovieDetail extends AppCompatActivity {
         TextView movieRatedTextView = (TextView) findViewById(R.id.movie_detail_vote_average);
         ImageView moviePosterView = (ImageView) findViewById(R.id.movie_detail_poster_image_view);
 
+        TextView m =(TextView) findViewById(R.id.test_reviews_label_text_view);
+
         // Get the intent from the grid item that was tapped
         Intent intent = getIntent();
 
@@ -34,6 +38,7 @@ public class MovieDetail extends AppCompatActivity {
                 String movieRelease = intent.getStringArrayExtra(Intent.EXTRA_TEXT)[2];
                 String moviePoster = intent.getStringArrayExtra(Intent.EXTRA_TEXT)[3];
                 String movieRating = intent.getStringArrayExtra(Intent.EXTRA_TEXT)[4];
+                String movieId = intent.getStringArrayExtra(Intent.EXTRA_TEXT)[5];
                 String release = getString(R.string.released_on_text) + " " + movieRelease;
                 String rated = getString(R.string.rated_text) + " " + movieRating;
 
@@ -45,6 +50,13 @@ public class MovieDetail extends AppCompatActivity {
                 String baseImageUrl = "http://image.tmdb.org/t/p/w342/";
 
                 Picasso.with(moviePosterView.getContext()).load(baseImageUrl + moviePoster).into(moviePosterView);
+
+                String  l =  NetworkUtility.buildVideoDatasetUrl(movieId).toString();
+                m.setText(l);
+
+
+
+
             }
         }
     }
