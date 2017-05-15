@@ -3,6 +3,7 @@
     <string name="menu_title_popular">Popular</string>
     <string name="menu_title_top_rated">Top Rated</string>
 
+    <!--Content Descriptions for accessibility-->
     <string name="grid_movie_poster_content_description">An image of a movie poster</string>
     <string name="empty_movie_content_description">An image to display when there are no movies.</string>
     <string name="favorite_movie_button_content_description">An image of a heart used for favorite movies</string>
@@ -10,8 +11,13 @@
 
     <string name="empty_text_message">No Movies, huh?</string>
     <string name="empty_text_message_subtext">Perhaps check the internet connection?</string>
+
+    <!--Details Screen strings-->
     <string name="released_on_text">Released On:</string>
     <string name="rated_text">Top Rating:</string>
     <string name="watch_trailer_label">Watch a trailer!</string>
     <string name="favorites_label">Mark as favorite</string>
+    <string name="reviews_label">Read some reviews</string>
+    <string name="no_reviews_text">Looks like there aren\'t any reviews for this movie. \nGo to themoviedb.org to write one!</string>
+
 </resources>
