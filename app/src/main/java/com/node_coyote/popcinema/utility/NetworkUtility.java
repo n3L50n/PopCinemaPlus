@@ -63,7 +63,7 @@ public class NetworkUtility {
 
     /**
      * A method that returns a url with the top rated movies tagged
-     * @return
+     * @return The top rated movies url
      */
     public static URL buildTopRatedMovieUrl() {
 
