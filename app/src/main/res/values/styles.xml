@@ -1,0 +1,66 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="DetailTitleStyle">
+        <item name="android:paddingTop">@dimen/general_margin_padding</item>
+        <item name="android:paddingRight">@dimen/general_margin_padding</item>
+        <item name="android:paddingLeft">@dimen/general_margin_padding</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/colorPrimaryDark</item>
+        <item name="android:textSize">@dimen/detail_title_text_size</item>
+    </style>
+
+    <style name="DetailSummaryStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">@dimen/general_margin_padding</item>
+        <item name="android:textColor">@color/detail_summary_text_color</item>
+    </style>
+
+    <style name="DetailRatingStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">@dimen/small_margin_padding</item>
+        <item name="android:paddingLeft">@dimen/general_margin_padding</item>
+        <item name="android:paddingRight">@dimen/general_margin_padding</item>
+    </style>
+
+    <style name="DetailReleaseStyle">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:paddingLeft">@dimen/general_margin_padding</item>
+        <item name="android:paddingRight">@dimen/general_margin_padding</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+    </style>
+
+    <style name="EmptyViewTextStyle">
+        <item name="android:layout_below">@+id/empty_movie_image</item>
+        <item name="android:text">@string/empty_text_message</item>
+        <item name="android:textSize">@dimen/empty_text_size</item>
+        <item name="android:textColor">@color/colorAccent</item>
+        <item name="android:visibility">invisible</item>
+        <item name="android:layout_centerInParent">true</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="EmptyViewSubtextStyle">
+        <item name="android:layout_below">@+id/empty_screen_display</item>
+        <item name="android:text">@string/empty_text_message_subtext</item>
+        <item name="android:textSize">@dimen/empty_subtext_size</item>
+        <item name="android:textColor">@color/colorAccentSecondary</item>
+        <item name="android:visibility">invisible</item>
+        <item name="android:layout_centerInParent">true</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+</resources>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.node_coyote.popcinema.MovieDetail">
+
+    <TextView
+        android:id="@+id/movie_detail_title"
+        style="@style/DetailTitleStyle" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:background="@color/colorAccentSecondary" />
+
+    <TextView
+        android:id="@+id/movie_detail_summary"
+        style="@style/DetailSummaryStyle" />
+
+    <TextView
+        android:id="@+id/movie_detail_release_date"
+        style="@style/DetailReleaseStyle" />
+
+    <TextView
+        android:id="@+id/movie_detail_vote_average"
+        style="@style/DetailRatingStyle" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorAccentSecondary" />
+
+    <ImageView
+        android:id="@+id/movie_detail_poster_image_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:background="@color/movie_background"
+        android:contentDescription="@string/grid_movie_poster_content_description"
+        android:padding="16dp" />
+
+</LinearLayout>
