@@ -14,13 +14,15 @@ public class Movie {
     private String mTitle;
     private String mRelease;
     private double mTopRated;
+    private long mMovieId;
 
-    public Movie(String poster, String summary, String title, String release, double topRated) {
+    public Movie(String poster, String summary, String title, String release, double topRated, long movieId) {
         mPosterPath = poster;
         mSummary = summary;
         mTitle = title;
         mRelease = release;
         mTopRated = topRated;
+        mMovieId = movieId;
     }
 
     public String getPosterPath(){
@@ -40,7 +42,10 @@ public class Movie {
     }
 
     public String getTopRated(){
-        String rated = String.valueOf(mTopRated);
-        return rated;
+        return String.valueOf(mTopRated);
+    }
+
+    public String getMovieId(){
+        return String.valueOf(mMovieId);
     }
 }

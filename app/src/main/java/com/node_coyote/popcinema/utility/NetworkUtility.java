@@ -33,6 +33,12 @@ public class NetworkUtility {
     // Use popular to call the popular sort.
     private static final String POPULAR = "popular";
 
+    // Use videos to call the video results url.
+    private static final String VIDEOS = "videos";
+
+    // Use reviews to call the reviews results url.
+    private static final String REVIEWS = "reviews";
+
     // add to the end of top rated or popular
     private static final String QUERY_PARAMETER = "?";
 
@@ -84,6 +90,51 @@ public class NetworkUtility {
             Log.v("MOVIES", topRatedMovieUrL.toString());
         }
         return topRatedMovieUrL;
+    }
+
+    public static URL buildVideoDatasetUrl() {
+
+        String builtUrl = MOVIE_BASE_URL
+                + VIDEOS
+                // + MOVIE_ID
+                + QUERY_PARAMETER
+                + API_KEY
+                + API_KEY_VALUE;
+
+        URL videoDatasetUrl = null;
+        try {
+            videoDatasetUrl = new URL(builtUrl);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        if (videoDatasetUrl != null) {
+            Log.v("VIDEO SET", videoDatasetUrl.toString());
+        }
+        return  videoDatasetUrl;
+    }
+
+    public static URL buildReviewDatasetUrl() {
+
+        String builtUrl = MOVIE_BASE_URL
+                + REVIEWS
+                // + MOVIE_ID
+                + QUERY_PARAMETER
+                + API_KEY
+                + API_KEY_VALUE;
+
+        URL reviewDatasetUrl = null;
+        try {
+            reviewDatasetUrl = new URL(builtUrl);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        if (reviewDatasetUrl != null) {
+            Log.v("REVIEW SET", reviewDatasetUrl.toString());
+        }
+
+        return reviewDatasetUrl;
     }
 
     /**

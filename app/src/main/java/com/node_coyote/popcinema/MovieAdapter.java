@@ -52,7 +52,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
                     mMovieData.get(adapterPosition).getSummary(),
                     mMovieData.get(adapterPosition).getRelease(),
                     mMovieData.get(adapterPosition).getPosterPath(),
-                    mMovieData.get(adapterPosition).getTopRated()
+                    mMovieData.get(adapterPosition).getTopRated(),
+                    mMovieData.get(adapterPosition).getMovieId()
             };
 
             mClickHandler.onClick(movieData);

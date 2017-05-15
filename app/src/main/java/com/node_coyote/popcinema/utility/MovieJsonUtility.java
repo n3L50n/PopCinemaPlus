@@ -27,6 +27,7 @@ public final class MovieJsonUtility {
         final String TITLE = "original_title";
         final String TOP_RATED = "vote_average";
         final String RELEASE_DATE = "release_date";
+        final String MOVIE_ID = "id";
 
         List<Movie> parsedMovies = new ArrayList<>();
 
@@ -45,8 +46,9 @@ public final class MovieJsonUtility {
                 String title = movie.getString(TITLE);
                 String release = movie.getString(RELEASE_DATE);
                 double topRated = movie.getDouble(TOP_RATED);
+                long movieId = movie.getLong(MOVIE_ID);
 
-                Movie newMovie = new Movie(poster, summary, title, release, topRated);
+                Movie newMovie = new Movie(poster, summary, title, release, topRated, movieId);
                 parsedMovies.add(newMovie);
             }
 
