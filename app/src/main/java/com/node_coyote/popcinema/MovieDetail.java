@@ -25,6 +25,7 @@ import java.util.List;
 public class MovieDetail extends AppCompatActivity {
 
     public List<String> mTrailerResults;
+    public URL mTrailerUrlSet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,55 +66,33 @@ public class MovieDetail extends AppCompatActivity {
 
                 Picasso.with(moviePosterView.getContext()).load(baseImageUrl + moviePoster).into(moviePosterView);
 
-//                trailer();
+                mTrailerUrlSet = NetworkUtility.buildVideoDatasetUrl(movieId);
 
-                //URL videoTrailerDataSet =  NetworkUtility.buildVideoDatasetUrl(movieId);
+                new FetchTrailerData().execute(mTrailerUrlSet);
 
                 ImageButton playTrailerButton = (ImageButton) findViewById(R.id.watch_icon_button);
                 playTrailerButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent trailerIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=qrJNO5eex9w"));
+                        Uri y = Uri.parse(mTrailerResults.get(0));
+                        Intent trailerIntent = new Intent(Intent.ACTION_VIEW, y);
                         startActivity(trailerIntent);
                     }
                 });
-                // TODO remove after trailer and reviews are linked up
-                //test.setText();
-
             }
         }
     }
 
 
-    public void trailer() {
-        new FetchTrailerDatas().execute();
-    }
-
-
-
     // TODO place in it's own java file
-    public class FetchTrailerDatas extends AsyncTask<String, Void, List<String>> {
-
-        List<String> mTrailerResults;
-        URL k;
+    public class FetchTrailerData extends AsyncTask<URL, Void, List<String>> {
 
         @Override
-        protected List<String> doInBackground(String... params) {
+        protected List<String> doInBackground(URL... params) {
 
             try {
 
-                k = new URL("\"http://api.themoviedb.org/3/movie/283995/videos?api_key=0d4d26dde08feee69c914af1a77fe3c4\"");
-
-            } catch (MalformedURLException e){
-                e.printStackTrace();
-            }
-
-            // TODO Call background thread with trailer data
-            //TrailerJsonUtility.getTrailerItemsFromJson( getApplicationContext() , videoTrailerDataSet);
-            mTrailerResults = null;
-
-            try {
-                String l =  NetworkUtility.getResponseFromHttp(k);
+                String l =  NetworkUtility.getResponseFromHttp(mTrailerUrlSet);
                 mTrailerResults = TrailerJsonUtility.getTrailerItemsFromJson(MovieDetail.this , l);
                 return mTrailerResults;
 
