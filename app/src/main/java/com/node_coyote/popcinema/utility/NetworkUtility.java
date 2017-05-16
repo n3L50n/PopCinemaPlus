@@ -42,6 +42,9 @@ public class NetworkUtility {
     // add to the end of top rated or popular
     private static final String QUERY_PARAMETER = "?";
 
+    // a forward slash to construct url paths
+    private static final String FORWARD_SLASH = "/";
+
     /**
      * A method that returns a movie url with the popular movies tagged
      * @return a url with an api key appended
@@ -96,9 +99,8 @@ public class NetworkUtility {
 
         String builtUrl = MOVIE_BASE_URL
                 + movieId
-                + "/"
+                + FORWARD_SLASH
                 + VIDEOS
-                // + MOVIE_ID
                 + QUERY_PARAMETER
                 + API_KEY
                 + API_KEY_VALUE;
@@ -116,11 +118,12 @@ public class NetworkUtility {
         return  videoDatasetUrl;
     }
 
-    public static URL buildReviewDatasetUrl() {
+    public static URL buildReviewDatasetUrl(String movieId) {
 
         String builtUrl = MOVIE_BASE_URL
+                + movieId
+                + FORWARD_SLASH
                 + REVIEWS
-                // + MOVIE_ID
                 + QUERY_PARAMETER
                 + API_KEY
                 + API_KEY_VALUE;
