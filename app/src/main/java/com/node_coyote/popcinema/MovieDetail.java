@@ -1,6 +1,8 @@
 package com.node_coyote.popcinema;
 
+import android.app.LoaderManager;
 import android.content.Intent;
+import android.content.Loader;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -8,6 +10,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.node_coyote.popcinema.utility.JsonUtility;
@@ -16,14 +19,16 @@ import com.node_coyote.popcinema.utility.Review;
 import com.squareup.picasso.Picasso;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
-public class MovieDetail extends AppCompatActivity {
+public class MovieDetail extends AppCompatActivity{
 
     public List<String> mTrailerResults;
-    public List<Review> mReviewResults;
+    public ArrayList<Review> mReviewResults;
     public URL mTrailerUrlSet;
     public URL mReviewUrlSet;
+    public ReviewAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +85,15 @@ public class MovieDetail extends AppCompatActivity {
                         startActivity(trailerIntent);
                     }
                 });
+
+
+                if (mReviewResults != null && !mReviewResults.isEmpty()) {
+                    mAdapter = new ReviewAdapter(this, mReviewResults);
+                    ListView listView = (ListView) findViewById(R.id.reviews_list_view);
+                    listView.setAdapter(mAdapter);
+                    mAdapter.addAll(mReviewResults);
+
+                }
             }
         }
     }
@@ -112,7 +126,7 @@ public class MovieDetail extends AppCompatActivity {
 
             try {
                 String l =  NetworkUtility.getResponseFromHttp(mReviewUrlSet);
-                mReviewResults = JsonUtility.getReviewItemsFromJson(MovieDetail.this , l);
+                mReviewResults = JsonUtility.getReviewItemsFromJson(l);
                 return mReviewResults;
 
             } catch (Exception e) {

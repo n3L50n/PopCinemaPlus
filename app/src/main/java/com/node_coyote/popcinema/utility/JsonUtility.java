@@ -89,7 +89,7 @@ public final class JsonUtility {
 
     }
 
-    public static List<Review> getReviewItemsFromJson(Context context, String trailerJsonString) throws JSONException {
+    public static ArrayList<Review> getReviewItemsFromJson(String trailerJsonString) throws JSONException {
 
         final String REVIEW_RESULTS = "results";
 
@@ -97,7 +97,7 @@ public final class JsonUtility {
         final String AUTHOR = "author";
         final String CONTENT= "content";
 
-        List<Review> parsedReview = new ArrayList<>();
+        ArrayList<Review> parsedReview = new ArrayList<>();
 
         try {
             JSONObject root = new JSONObject(trailerJsonString);
