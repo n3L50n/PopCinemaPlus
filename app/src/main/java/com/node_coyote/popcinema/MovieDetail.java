@@ -1,31 +1,29 @@
 package com.node_coyote.popcinema;
 
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.node_coyote.popcinema.utility.Movie;
-import com.node_coyote.popcinema.utility.MovieJsonUtility;
+import com.node_coyote.popcinema.utility.JsonUtility;
 import com.node_coyote.popcinema.utility.NetworkUtility;
-import com.node_coyote.popcinema.utility.TrailerJsonUtility;
+import com.node_coyote.popcinema.utility.Review;
 import com.squareup.picasso.Picasso;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
 public class MovieDetail extends AppCompatActivity {
 
     public List<String> mTrailerResults;
+    public List<Review> mReviewResults;
     public URL mTrailerUrlSet;
+    public URL mReviewUrlSet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,8 +65,11 @@ public class MovieDetail extends AppCompatActivity {
                 Picasso.with(moviePosterView.getContext()).load(baseImageUrl + moviePoster).into(moviePosterView);
 
                 mTrailerUrlSet = NetworkUtility.buildVideoDatasetUrl(movieId);
+                mReviewUrlSet = NetworkUtility.buildReviewDatasetUrl(movieId);
+                test.setText(mReviewUrlSet.toString());
 
                 new FetchTrailerData().execute(mTrailerUrlSet);
+                new FetchReviewData().execute(mReviewUrlSet);
 
                 ImageButton playTrailerButton = (ImageButton) findViewById(R.id.watch_icon_button);
                 playTrailerButton.setOnClickListener(new View.OnClickListener() {
@@ -93,8 +94,26 @@ public class MovieDetail extends AppCompatActivity {
             try {
 
                 String l =  NetworkUtility.getResponseFromHttp(mTrailerUrlSet);
-                mTrailerResults = TrailerJsonUtility.getTrailerItemsFromJson(MovieDetail.this , l);
+                mTrailerResults = JsonUtility.getTrailerItemsFromJson(MovieDetail.this , l);
                 return mTrailerResults;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+    }
+
+    // TODO place in it's own java file
+    public class FetchReviewData extends AsyncTask<URL, Void, List<Review>> {
+
+        @Override
+        protected List<Review> doInBackground(URL... params) {
+
+            try {
+                String l =  NetworkUtility.getResponseFromHttp(mReviewUrlSet);
+                mReviewResults = JsonUtility.getReviewItemsFromJson(MovieDetail.this , l);
+                return mReviewResults;
 
             } catch (Exception e) {
                 e.printStackTrace();

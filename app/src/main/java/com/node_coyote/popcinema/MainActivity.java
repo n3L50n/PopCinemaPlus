@@ -14,7 +14,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.node_coyote.popcinema.utility.Movie;
-import com.node_coyote.popcinema.utility.MovieJsonUtility;
+import com.node_coyote.popcinema.utility.JsonUtility;
 import com.node_coyote.popcinema.utility.NetworkUtility;
 
 import java.net.URL;
@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                 // By default, the app opens with Popular Movies. It is up to the user to toggle to top rated
                 String jsonPopularMovieResponse = NetworkUtility.getResponseFromHttp(popularMovieUrl);
 
-                mMovieData = MovieJsonUtility.getMovieStringsFromJson(MainActivity.this, jsonPopularMovieResponse);
+                mMovieData = JsonUtility.getMovieStringsFromJson(MainActivity.this, jsonPopularMovieResponse);
 
                 return mMovieData;
 
@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                 // By default, the app opens with Popular Movies. It is up to the user to toggle to top rated
                 String jsonPopularMovieResponse = NetworkUtility.getResponseFromHttp(topRatedMovieUrl);
 
-                mMovieData = MovieJsonUtility.getMovieStringsFromJson(MainActivity.this, jsonPopularMovieResponse);
+                mMovieData = JsonUtility.getMovieStringsFromJson(MainActivity.this, jsonPopularMovieResponse);
 
                 return mMovieData;
 
