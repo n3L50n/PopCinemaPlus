@@ -30,6 +30,7 @@ public class MovieDetail extends AppCompatActivity{
     public URL mTrailerUrlSet;
     public URL mReviewUrlSet;
     public ReviewAdapter mAdapter;
+    public TextView noReviews;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +47,8 @@ public class MovieDetail extends AppCompatActivity{
         TextView movieReleaseTextView = (TextView) findViewById(R.id.movie_detail_release_date);
         TextView movieRatedTextView = (TextView) findViewById(R.id.movie_detail_vote_average);
         ImageView moviePosterView = (ImageView) findViewById(R.id.movie_detail_poster_image_view);
+        noReviews = (TextView) findViewById(R.id.empty_reviews_view);
+
 
         // Get the intent from the grid item that was tapped
         Intent intent = getIntent();
