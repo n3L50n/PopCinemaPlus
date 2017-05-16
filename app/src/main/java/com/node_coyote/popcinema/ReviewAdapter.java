@@ -33,18 +33,18 @@ public class ReviewAdapter extends ArrayAdapter<Review> {
 
         final Review currentReview = getItem(position);
 
-        TextView authorTextView = (TextView) listItem.findViewById(R.id.author);
         String currentAuthor = currentReview.getAuthor();
+        TextView authorTextView = (TextView) listItem.findViewById(R.id.author);
+
         if (currentAuthor != null) {
             authorTextView.setText(currentAuthor);
         }
 
-        TextView contentTextView = (TextView) listItem.findViewById(R.id.content);
         String currentContent = currentReview.getContent();
+        TextView contentTextView = (TextView) listItem.findViewById(R.id.content);
         if (currentContent != null) {
             contentTextView.setText(currentContent);
         }
-
 
         return listItem;
     }

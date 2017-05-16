@@ -89,7 +89,7 @@ public final class JsonUtility {
 
     }
 
-    public static ArrayList<Review> getReviewItemsFromJson(String trailerJsonString) throws JSONException {
+    public static ArrayList<Review> getReviewItemsFromJson(Context context , String trailerJsonString) throws JSONException {
 
         final String REVIEW_RESULTS = "results";
 

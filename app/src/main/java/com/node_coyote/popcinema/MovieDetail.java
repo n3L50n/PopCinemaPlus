@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -35,15 +36,16 @@ public class MovieDetail extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
 
+        mAdapter = new ReviewAdapter(this, new ArrayList<Review>());
+        ListView listView = (ListView) findViewById(R.id.reviews_list_view);
+        listView.setAdapter(mAdapter);
+
         // Find Movie Detail TextViews
         TextView movieTitleTextView = (TextView) findViewById(R.id.movie_detail_title);
         TextView movieSummaryTextView = (TextView) findViewById(R.id.movie_detail_summary);
         TextView movieReleaseTextView = (TextView) findViewById(R.id.movie_detail_release_date);
         TextView movieRatedTextView = (TextView) findViewById(R.id.movie_detail_vote_average);
         ImageView moviePosterView = (ImageView) findViewById(R.id.movie_detail_poster_image_view);
-
-        // TODO remove after trailer and reviews are linked up
-        TextView test =(TextView) findViewById(R.id.test_reviews_label_text_view);
 
         // Get the intent from the grid item that was tapped
         Intent intent = getIntent();
@@ -71,7 +73,6 @@ public class MovieDetail extends AppCompatActivity{
 
                 mTrailerUrlSet = NetworkUtility.buildVideoDatasetUrl(movieId);
                 mReviewUrlSet = NetworkUtility.buildReviewDatasetUrl(movieId);
-                test.setText(mReviewUrlSet.toString());
 
                 new FetchTrailerData().execute(mTrailerUrlSet);
                 new FetchReviewData().execute(mReviewUrlSet);
@@ -85,19 +86,9 @@ public class MovieDetail extends AppCompatActivity{
                         startActivity(trailerIntent);
                     }
                 });
-
-
-                if (mReviewResults != null && !mReviewResults.isEmpty()) {
-                    mAdapter = new ReviewAdapter(this, mReviewResults);
-                    ListView listView = (ListView) findViewById(R.id.reviews_list_view);
-                    listView.setAdapter(mAdapter);
-                    mAdapter.addAll(mReviewResults);
-
-                }
             }
         }
     }
-
 
     // TODO place in it's own java file
     public class FetchTrailerData extends AsyncTask<URL, Void, List<String>> {
@@ -126,7 +117,10 @@ public class MovieDetail extends AppCompatActivity{
 
             try {
                 String l =  NetworkUtility.getResponseFromHttp(mReviewUrlSet);
-                mReviewResults = JsonUtility.getReviewItemsFromJson(l);
+                mReviewResults = JsonUtility.getReviewItemsFromJson(MovieDetail.this, l);
+                if (mReviewResults != null && !mReviewResults.isEmpty()) {
+                    mAdapter.addAll(mReviewResults);
+                }
                 return mReviewResults;
 
             } catch (Exception e) {
