@@ -1,5 +1,6 @@
 package com.node_coyote.popcinema.data;
 
+import android.content.ContentResolver;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
@@ -8,6 +9,9 @@ import android.provider.BaseColumns;
  */
 
 public class MovieContract {
+
+    // Empty constructor. Let's not instantiate the contract class.
+    public MovieContract(){}
 
     public static final String CONTENT_AUTHORITY = "com.node_coyote.popcinema.data";
 
@@ -20,6 +24,16 @@ public class MovieContract {
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
                 .appendPath(PATH_MOVIE)
                 .build();
+
+        /**
+         *
+         */
+        public static final String CONTENT_LIST_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" +  PATH_MOVIE;
+
+        /**
+         *
+         */
+        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" +  PATH_MOVIE;
 
         /**
          * The name of the database for movies
