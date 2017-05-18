@@ -1,7 +1,11 @@
 package com.node_coyote.popcinema;
 
+import android.app.LoaderManager;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.node_coyote.popcinema.data.MovieContract.MovieEntry;
 import com.node_coyote.popcinema.utility.Movie;
 import com.node_coyote.popcinema.utility.JsonUtility;
 import com.node_coyote.popcinema.utility.NetworkUtility;
@@ -20,17 +25,23 @@ import com.node_coyote.popcinema.utility.NetworkUtility;
 import java.net.URL;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieAdapterOnClickHandler {
+public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieAdapterOnClickHandler, LoaderManager.LoaderCallbacks<Cursor> {
 
     /**
      * A variable to store the grids view recycler for the movie posters
      */
     private RecyclerView mRecyclerView;
 
+    // TODO remove in place of CursorAdapter, or use both?
     /**
      * An adapter to populate the grid movie posters with popular movie posters
      */
     private MovieAdapter mAdapter;
+
+    /**
+     * An adapter to populate the grid movie database with popular movie posters
+     */
+    private MovieGridCursorAdapter mCursorAdapter;
 
     /**
      * Use to display text if not connected to the internet
@@ -39,6 +50,11 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     private TextView mEmptyDisplaySubtext;
 
     private List<Movie> mMovieData;
+
+    /**
+     * Use as an arbitrary identifier for the movie loader data.
+     */
+    private static final int MOVIE_LOADER = 42;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +78,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         GridLayoutManager layoutManager = new GridLayoutManager(context, numberOfMovieColumns);
         mRecyclerView.setLayoutManager(layoutManager);
 
+
+        //mCursorAdapter = new MovieGridCursorAdapter(this, null);
         mAdapter = new MovieAdapter(this);
 
         mRecyclerView.setAdapter(mAdapter);
@@ -90,6 +108,39 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        // Define a projection of columns from table.
+        String[] projection = {
+                MovieEntry._ID,
+                MovieEntry.COLUMN_TITLE,
+                MovieEntry.COLUMN_POSTER,
+                MovieEntry.COLUMN_RATING,
+                MovieEntry.COLUMN_RELEASE_DATE,
+                MovieEntry.COLUMN_SUMMARY,
+                MovieEntry.COLUMN_MOVIE_ID,
+                MovieEntry.COLUMN_TRAILER_SET,
+                MovieEntry.COLUMN_FAVORITE
+        };
+
+        return new CursorLoader(this,
+                MovieEntry.CONTENT_URI,
+                projection,
+                null,
+                null,
+                null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        // Update Cursor data.
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        // Hmm...
+    }
+
     /**
      * Class to help move the popular request off the main thread
      */
@@ -110,6 +161,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                 String jsonPopularMovieResponse = NetworkUtility.getResponseFromHttp(popularMovieUrl);
 
                 mMovieData = JsonUtility.getMovieStringsFromJson(MainActivity.this, jsonPopularMovieResponse);
+
+                getLoaderManager().initLoader(MOVIE_LOADER, null, MainActivity.this);
 
                 return mMovieData;
 
@@ -183,6 +236,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                 String jsonPopularMovieResponse = NetworkUtility.getResponseFromHttp(topRatedMovieUrl);
 
                 mMovieData = JsonUtility.getMovieStringsFromJson(MainActivity.this, jsonPopularMovieResponse);
+
+                getLoaderManager().initLoader(MOVIE_LOADER, null, MainActivity.this);
 
                 return mMovieData;
 

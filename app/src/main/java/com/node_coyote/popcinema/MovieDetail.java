@@ -103,6 +103,8 @@ public class MovieDetail extends AppCompatActivity{
 
                 String l =  NetworkUtility.getResponseFromHttp(mTrailerUrlSet);
                 mTrailerResults = JsonUtility.getTrailerItemsFromJson(MovieDetail.this , l);
+                // TODO Perhaps a good place to save off the set of trailer paths
+                //  COLUMN_TRAILER
                 return mTrailerResults;
 
             } catch (Exception e) {
@@ -124,6 +126,7 @@ public class MovieDetail extends AppCompatActivity{
                 if (mReviewResults != null && !mReviewResults.isEmpty()) {
                     mAdapter.addAll(mReviewResults);
                 }
+                // TODO perhaps a good place to save off the Review paths
                 return mReviewResults;
 
             } catch (Exception e) {
