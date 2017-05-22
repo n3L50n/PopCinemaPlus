@@ -64,7 +64,6 @@ public class MovieContract {
          */
         public static final String COLUMN_POSTER = "poster";
 
-
         /**
          * Type: REAL
          * A float average of user votes on a movie, user ratings

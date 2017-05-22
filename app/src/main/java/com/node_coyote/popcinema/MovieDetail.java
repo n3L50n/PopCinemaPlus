@@ -1,19 +1,18 @@
 package com.node_coyote.popcinema;
 
-import android.app.LoaderManager;
+import android.content.ContentValues;
 import android.content.Intent;
-import android.content.Loader;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.node_coyote.popcinema.data.MovieContract;
 import com.node_coyote.popcinema.utility.JsonUtility;
 import com.node_coyote.popcinema.utility.NetworkUtility;
 import com.node_coyote.popcinema.utility.Review;
@@ -21,12 +20,11 @@ import com.squareup.picasso.Picasso;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 public class MovieDetail extends AppCompatActivity{
 
-    public List<String> mTrailerResults;
-    public ArrayList<Review> mReviewResults;
+    public ContentValues[] mTrailerResults;
+    public ContentValues[] mReviewResults;
     public URL mTrailerUrlSet;
     public URL mReviewUrlSet;
     public ReviewAdapter mAdapter;
@@ -41,7 +39,7 @@ public class MovieDetail extends AppCompatActivity{
         ListView listView = (ListView) findViewById(R.id.reviews_list_view);
         listView.setAdapter(mAdapter);
 
-        // Find Movie Detail TextViews
+        // Find movie Detail TextViews
         TextView movieTitleTextView = (TextView) findViewById(R.id.movie_detail_title);
         TextView movieSummaryTextView = (TextView) findViewById(R.id.movie_detail_summary);
         TextView movieReleaseTextView = (TextView) findViewById(R.id.movie_detail_release_date);
@@ -84,7 +82,8 @@ public class MovieDetail extends AppCompatActivity{
                 playTrailerButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Uri y = Uri.parse(mTrailerResults.get(0));
+                        //Uri y = Uri.parse(mTrailerResults.get(0));
+                        Uri y = Uri.parse(MovieContract.MovieEntry.COLUMN_TRAILER);
                         Intent trailerIntent = new Intent(Intent.ACTION_VIEW, y);
                         startActivity(trailerIntent);
                     }
@@ -94,17 +93,16 @@ public class MovieDetail extends AppCompatActivity{
     }
 
     // TODO place in it's own java file
-    public class FetchTrailerData extends AsyncTask<URL, Void, List<String>> {
+    public class FetchTrailerData extends AsyncTask<URL, Void, ContentValues[]> {
 
         @Override
-        protected List<String> doInBackground(URL... params) {
+        protected ContentValues[] doInBackground(URL... params) {
 
             try {
 
-                String l =  NetworkUtility.getResponseFromHttp(mTrailerUrlSet);
-                mTrailerResults = JsonUtility.getTrailerItemsFromJson(MovieDetail.this , l);
-                // TODO Perhaps a good place to save off the set of trailer paths
-                //  COLUMN_TRAILER
+                String responseFromHttp =  NetworkUtility.getResponseFromHttp(mTrailerUrlSet);
+                mTrailerResults = JsonUtility.getTrailerItemsFromJson(MovieDetail.this , responseFromHttp);
+
                 return mTrailerResults;
 
             } catch (Exception e) {
@@ -115,18 +113,15 @@ public class MovieDetail extends AppCompatActivity{
     }
 
     // TODO place in it's own java file
-    public class FetchReviewData extends AsyncTask<URL, Void, List<Review>> {
+    public class FetchReviewData extends AsyncTask<URL, Void, ContentValues[]> {
 
         @Override
-        protected List<Review> doInBackground(URL... params) {
+        protected ContentValues[] doInBackground(URL... params) {
 
             try {
-                String l =  NetworkUtility.getResponseFromHttp(mReviewUrlSet);
-                mReviewResults = JsonUtility.getReviewItemsFromJson(MovieDetail.this, l);
-                if (mReviewResults != null && !mReviewResults.isEmpty()) {
-                    mAdapter.addAll(mReviewResults);
-                }
-                // TODO perhaps a good place to save off the Review paths
+                String responseFromHttp =  NetworkUtility.getResponseFromHttp(mReviewUrlSet);
+                mReviewResults = JsonUtility.getReviewItemsFromJson(MovieDetail.this, responseFromHttp);
+
                 return mReviewResults;
 
             } catch (Exception e) {

@@ -1,14 +1,14 @@
 package com.node_coyote.popcinema.utility;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.util.Log;
+
+import com.node_coyote.popcinema.data.MovieContract.MovieEntry;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by node_coyote on 5/2/17.
@@ -16,7 +16,7 @@ import java.util.List;
 
 public final class JsonUtility {
 
-    public static List<Movie> getMovieStringsFromJson(Context context, String movieJsonString) throws JSONException {
+    public static ContentValues[] getMovieStringsFromJson(Context context, String movieJsonString) throws JSONException {
 
         // results is the array holding all of our movies.
         final String MOVIE_RESULTS = "results";
@@ -29,13 +29,11 @@ public final class JsonUtility {
         final String RELEASE_DATE = "release_date";
         final String MOVIE_ID = "id";
 
-        List<Movie> parsedMovies = new ArrayList<>();
+        JSONObject root = new JSONObject(movieJsonString);
+        JSONArray results = root.getJSONArray(MOVIE_RESULTS);
+        ContentValues[] parsedMovieValues = new ContentValues[root.length()];
 
         try {
-
-            JSONObject root = new JSONObject(movieJsonString);
-
-            JSONArray results = root.getJSONArray(MOVIE_RESULTS);
 
             for (int i = 0; i < results.length(); i++) {
 
@@ -48,30 +46,38 @@ public final class JsonUtility {
                 double topRated = movie.getDouble(TOP_RATED);
                 long movieId = movie.getLong(MOVIE_ID);
 
-                Movie newMovie = new Movie(poster, summary, title, release, topRated, movieId);
-                parsedMovies.add(newMovie);
+                ContentValues values = new ContentValues();
+                values.put(MovieEntry.COLUMN_POSTER, poster);
+                values.put(MovieEntry.COLUMN_SUMMARY, summary);
+                values.put(MovieEntry.COLUMN_TITLE, title);
+                values.put(MovieEntry.COLUMN_RELEASE_DATE, release);
+                values.put(MovieEntry.COLUMN_RATING, topRated);
+                values.put(MovieEntry.COLUMN_MOVIE_ID, movieId);
+
+                parsedMovieValues[i] = values;
             }
 
         } catch (JSONException e) {
             Log.e("MovieJSONUtility", "Problem parsing movie JSON results");
         }
 
-        return parsedMovies;
+        context.getContentResolver().bulkInsert(MovieEntry.CONTENT_URI, parsedMovieValues);
+        return parsedMovieValues;
     }
 
-    public static List<String> getTrailerItemsFromJson(Context context, String trailerJsonString) throws JSONException {
+    public static ContentValues[] getTrailerItemsFromJson(Context context, String trailerJsonString) throws JSONException {
 
         final String TRAILER_RESULTS = "results";
 
         // objects within the trailer results array
         final String TRAILER_KEY = "key";
         final String YOUTUBE_BASE_URL = "https://www.youtube.com/watch?v=";
+        JSONObject root = new JSONObject(trailerJsonString);
+        JSONArray results = root.getJSONArray(TRAILER_RESULTS);
 
-        List<String> parsedTrailer = new ArrayList<>();
+        ContentValues[] parsedTrailerValues = new ContentValues[root.length()];
 
         try {
-            JSONObject root = new JSONObject(trailerJsonString);
-            JSONArray results = root.getJSONArray(TRAILER_RESULTS);
 
             for (int i = 0; i < results.length(); i ++) {
 
@@ -79,17 +85,21 @@ public final class JsonUtility {
 
                 String key = trailer.getString(TRAILER_KEY);
                 String newTrailer = YOUTUBE_BASE_URL + key;
-                parsedTrailer.add(newTrailer);
+
+                ContentValues values = new ContentValues();
+                values.put(MovieEntry.COLUMN_TRAILER, newTrailer);
+                parsedTrailerValues[i] = values;
             }
         } catch (JSONException e) {
-            Log.e("TrailerJSONUtility", parsedTrailer.toString());
+            Log.e("TrailerJSONUtility", "Problem parsing trailer json.");
         }
 
-        return parsedTrailer;
+        context.getContentResolver().bulkInsert(MovieEntry.CONTENT_URI, parsedTrailerValues);
+        return parsedTrailerValues;
 
     }
 
-    public static ArrayList<Review> getReviewItemsFromJson(Context context , String trailerJsonString) throws JSONException {
+    public static ContentValues[] getReviewItemsFromJson(Context context , String trailerJsonString) throws JSONException {
 
         final String REVIEW_RESULTS = "results";
 
@@ -97,11 +107,12 @@ public final class JsonUtility {
         final String AUTHOR = "author";
         final String CONTENT= "content";
 
-        ArrayList<Review> parsedReview = new ArrayList<>();
+        JSONObject root = new JSONObject(trailerJsonString);
+        JSONArray results = root.getJSONArray(REVIEW_RESULTS);
+
+        ContentValues[] parsedReviewValues = new ContentValues[results.length()];
 
         try {
-            JSONObject root = new JSONObject(trailerJsonString);
-            JSONArray results = root.getJSONArray(REVIEW_RESULTS);
 
             for (int i = 0; i < results.length(); i ++) {
 
@@ -110,14 +121,15 @@ public final class JsonUtility {
                 String author = review.getString(AUTHOR);
                 String content = review.getString(CONTENT);
 
-                Review newReview = new Review(author, content);
-                parsedReview.add(newReview);
+                ContentValues values = new ContentValues();
+
             }
         } catch (JSONException e) {
-            Log.e("ReviewJSONUtility", parsedReview.toString());
+            Log.e("ReviewJSONUtility", "Problem parsing Reviews");
         }
 
-        return parsedReview;
+        context.getContentResolver().bulkInsert(MovieEntry.CONTENT_URI, parsedReviewValues);
+        return parsedReviewValues;
 
     }
 

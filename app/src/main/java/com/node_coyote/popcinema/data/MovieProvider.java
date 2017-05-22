@@ -9,7 +9,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.node_coyote.popcinema.data.MovieContract.MovieEntry;
 
@@ -31,7 +30,7 @@ public class MovieProvider extends ContentProvider {
     // UriMatcher object to match a content uri to a code.
     private static final UriMatcher sMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
-    // The items to match with the uri matcher. Is it a Movie, or all Movies?
+    // The items to match with the uri matcher. Is it a movie, or all movies?
     static {
         sMatcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_MOVIE, MOVIE);
         sMatcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_MOVIE + "/#", MOVIE_ID);
@@ -104,7 +103,7 @@ public class MovieProvider extends ContentProvider {
     @Override
     public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
 
-        // Get a writable database to fill with Movie data goodies.
+        // Get a writable database to fill with movie data goodies.
         final SQLiteDatabase database = mHelper.getWritableDatabase();
 
         switch (sMatcher.match(uri)) {

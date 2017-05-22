@@ -1,6 +1,8 @@
 package com.node_coyote.popcinema;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,10 +11,9 @@ import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.node_coyote.popcinema.utility.Movie;
+import com.node_coyote.popcinema.data.MovieContract.MovieEntry;
 import com.squareup.picasso.Picasso;
 
-import java.util.List;
 
 /**
  * Created by node_coyote on 5/1/17.
@@ -20,7 +21,8 @@ import java.util.List;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHolder> {
 
-    private List<Movie> mMovieData;
+    private ContentValues[] mMovieData;
+    private Cursor mCursor;
 
     private final MovieAdapterOnClickHandler mClickHandler;
 
@@ -47,16 +49,16 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
         public void onClick(View view) {
             int adapterPosition = getAdapterPosition();
 
-            String[] movieData = {
-                    mMovieData.get(adapterPosition).getTitle(),
-                    mMovieData.get(adapterPosition).getSummary(),
-                    mMovieData.get(adapterPosition).getRelease(),
-                    mMovieData.get(adapterPosition).getPosterPath(),
-                    mMovieData.get(adapterPosition).getTopRated(),
-                    mMovieData.get(adapterPosition).getMovieId()
-            };
+//            String[] movieData = {
+//                    mMovieData.get(adapterPosition).getTitle(),
+//                    mMovieData.get(adapterPosition).getSummary(),
+//                    mMovieData.get(adapterPosition).getRelease(),
+//                    mMovieData.get(adapterPosition).getPosterPath(),
+//                    mMovieData.get(adapterPosition).getTopRated(),
+//                    mMovieData.get(adapterPosition).getMovieId()
+//            };
 
-            mClickHandler.onClick(movieData);
+            //mClickHandler.onClick(movieData);
         }
     }
 
@@ -79,24 +81,37 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     public void onBindViewHolder(MovieAdapterViewHolder holder, int position) {
 
         // Set the views of the main page grid items with title and poster image.
-        String movie = mMovieData.get(position).getTitle();
-        String poster = mMovieData.get(position).getPosterPath();
 
+        mCursor.moveToPosition(position);
+
+        int titleColumnIndex = mCursor.getColumnIndex(MovieEntry.COLUMN_TITLE);
+        int posterColumnIndex = mCursor.getColumnIndex(MovieEntry.COLUMN_POSTER);
+
+        String movieTitle = mCursor.getString(titleColumnIndex);
+        String posterPath = mCursor.getString(posterColumnIndex);
         String posterBaseUrl = "http://image.tmdb.org/t/p/w342/";
+        String fullPosterUrl = posterBaseUrl + posterPath;
 
-        Picasso.with(holder.mGridMoviePoster.getContext()).load(posterBaseUrl + poster).into(holder.mGridMoviePoster);
-        holder.mGridMovieTitle.setText(movie);
+        if (!fullPosterUrl.isEmpty() && fullPosterUrl.length() != 0) {
+            Picasso.with(holder.mGridMoviePoster.getContext()).load(fullPosterUrl).into(holder.mGridMoviePoster);
+            holder.mGridMovieTitle.setText(movieTitle);
+        }
 
     }
 
     @Override
     public int getItemCount() {
         // Check for empty data to prevent crash
-        if (mMovieData == null) return 0;
-        return mMovieData.size();
+        if (mCursor == null) return 0;
+        return mCursor.getCount();
     }
 
-    public void setMovieData(List<Movie> movieData) {
+    void swapCursor(Cursor newCursor) {
+        mCursor = newCursor;
+        notifyDataSetChanged();
+    }
+
+    public void setMovieData(ContentValues[] movieData) {
         mMovieData = movieData;
         notifyDataSetChanged();
     }

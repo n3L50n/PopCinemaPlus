@@ -1,6 +1,7 @@
 package com.node_coyote.popcinema;
 
 import android.app.LoaderManager;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -18,30 +19,24 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.node_coyote.popcinema.data.MovieContract.MovieEntry;
-import com.node_coyote.popcinema.utility.Movie;
 import com.node_coyote.popcinema.utility.JsonUtility;
 import com.node_coyote.popcinema.utility.NetworkUtility;
 
 import java.net.URL;
-import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieAdapterOnClickHandler, LoaderManager.LoaderCallbacks<Cursor> {
+public class MainActivity extends AppCompatActivity
+        implements MovieAdapter.MovieAdapterOnClickHandler,
+        LoaderManager.LoaderCallbacks<Cursor> {
 
     /**
      * A variable to store the grids view recycler for the movie posters
      */
     private RecyclerView mRecyclerView;
 
-    // TODO remove in place of CursorAdapter, or use both?
     /**
      * An adapter to populate the grid movie posters with popular movie posters
      */
     private MovieAdapter mAdapter;
-
-    /**
-     * An adapter to populate the grid movie database with popular movie posters
-     */
-    private MovieGridCursorAdapter mCursorAdapter;
 
     /**
      * Use to display text if not connected to the internet
@@ -49,7 +44,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     private TextView mEmptyDisplay;
     private TextView mEmptyDisplaySubtext;
 
-    private List<Movie> mMovieData;
+    private ContentValues[] mMovieData;
+    private int mPosition = RecyclerView.NO_POSITION;
 
     /**
      * Use as an arbitrary identifier for the movie loader data.
@@ -79,11 +75,11 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         mRecyclerView.setLayoutManager(layoutManager);
 
 
-        //mCursorAdapter = new MovieGridCursorAdapter(this, null);
         mAdapter = new MovieAdapter(this);
 
         mRecyclerView.setAdapter(mAdapter);
 
+        getLoaderManager().initLoader(MOVIE_LOADER, null, MainActivity.this);
         loadMovieData();
     }
 
@@ -133,18 +129,21 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        // Update Cursor data.
+        mAdapter.swapCursor(data);
+        if (mPosition == RecyclerView.NO_POSITION) mPosition = 0;
+        mRecyclerView.smoothScrollToPosition(mPosition);
+        //if (data.getCount() != 0) showMoviesGrid();
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        // Hmm...
+        mAdapter.swapCursor(null);
     }
 
     /**
      * Class to help move the popular request off the main thread
      */
-    public class FetchMovieData extends AsyncTask<String, Void, List<Movie>> {
+    public class FetchMovieData extends AsyncTask<String, Void, ContentValues[]> {
 
         @Override
         protected void onPreExecute() {
@@ -152,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         }
 
         @Override
-        protected List<Movie> doInBackground(String... params) {
+        protected ContentValues[] doInBackground(String... params) {
 
             URL popularMovieUrl = NetworkUtility.buildPopularMovieUrl();
 
@@ -162,8 +161,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
                 mMovieData = JsonUtility.getMovieStringsFromJson(MainActivity.this, jsonPopularMovieResponse);
 
-                getLoaderManager().initLoader(MOVIE_LOADER, null, MainActivity.this);
-
                 return mMovieData;
 
             } catch (Exception e) {
@@ -171,17 +168,17 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                 return null;
             }
         }
-
-        @Override
-        protected void onPostExecute(List<Movie> movieData) {
-
-            if (movieData != null) {
-                mAdapter.setMovieData(movieData);
-                mEmptyDisplay.setVisibility(View.INVISIBLE);
-                mEmptyDisplaySubtext.setVisibility(View.INVISIBLE);
-                mRecyclerView.setVisibility(View.VISIBLE);
-            }
-        }
+//
+//        @Override
+//        protected void onPostExecute(ContentValues[] movieData) {
+////
+////            if (movieData != null) {
+////                mAdapter.setMovieData(movieData);
+////                mEmptyDisplay.setVisibility(View.INVISIBLE);
+////                mEmptyDisplaySubtext.setVisibility(View.INVISIBLE);
+////                mRecyclerView.setVisibility(View.VISIBLE);
+////            }
+//        }
     }
 
     @Override
@@ -219,7 +216,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     /**
      * Class to help move the top rated request off the main thread
      */
-    public class FetchTopRatedMovieData extends AsyncTask<String, Void, List<Movie>> {
+    public class FetchTopRatedMovieData extends AsyncTask<String, Void, ContentValues[]> {
 
         @Override
         protected void onPreExecute() {
@@ -227,7 +224,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         }
 
         @Override
-        protected List<Movie> doInBackground(String... params) {
+        protected ContentValues[] doInBackground(String... params) {
 
             URL topRatedMovieUrl = NetworkUtility.buildTopRatedMovieUrl();
 
@@ -247,16 +244,17 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
             }
         }
 
-        @Override
-        protected void onPostExecute(List<Movie> movieData) {
-
-            if (movieData != null) {
-                mAdapter.setMovieData(movieData);
-                mEmptyDisplay.setVisibility(View.INVISIBLE);
-                mEmptyDisplaySubtext.setVisibility(View.INVISIBLE);
-                mRecyclerView.setVisibility(View.VISIBLE);
-            }
-        }
+//        @Override
+//        protected void onPostExecute(ContentValues[] movieData) {
+//
+//            if (movieData != null) {
+//                //mAdapter.swapCursor(movieData);
+//                mAdapter.setMovieData(movieData);
+//                mEmptyDisplay.setVisibility(View.INVISIBLE);
+//                mEmptyDisplaySubtext.setVisibility(View.INVISIBLE);
+//                mRecyclerView.setVisibility(View.VISIBLE);
+//            }
+//        }
 
     }
 
