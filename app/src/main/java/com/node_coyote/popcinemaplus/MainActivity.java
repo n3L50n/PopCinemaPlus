@@ -7,11 +7,16 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -78,20 +83,22 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         mEmptyDisplay = (TextView) findViewById(R.id.empty_screen_display);
-        mEmptyDisplay.setVisibility(View.VISIBLE);
-
         mEmptyDisplaySubtext = (TextView) findViewById(R.id.empty_screen_display_subtext);
-        mEmptyDisplaySubtext.setVisibility(View.VISIBLE);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.movie_recycler_view);
         mRecyclerView.setHasFixedSize(true);
 
-        Context context = MainActivity.this;
-
         int numberOfMovieColumns = 2;
 
+        if (checkforDatabase()){
+            loadMovieData();
+        } else {
+            getLoaderManager().restartLoader(POPULAR_MOVIE_LOADER, null, this);
+        }
+
+
         //  Create a grid layout manager
-        GridLayoutManager layoutManager = new GridLayoutManager(context, numberOfMovieColumns);
+        GridLayoutManager layoutManager = new GridLayoutManager(MainActivity.this, numberOfMovieColumns);
         mRecyclerView.setLayoutManager(layoutManager);
 
 
@@ -99,15 +106,62 @@ public class MainActivity extends AppCompatActivity
 
         mRecyclerView.setAdapter(mAdapter);
 
-        getLoaderManager().initLoader(POPULAR_MOVIE_LOADER, null, MainActivity.this);
-        loadMovieData();
     }
 
     /**
      * A method to load movie data in the background
      */
     private void loadMovieData() {
-        new FetchMovieData().execute();
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            new FetchMovieData().execute();
+            new FetchTopRatedMovieData().execute();
+            getLoaderManager().initLoader(POPULAR_MOVIE_LOADER, null, this);
+            showMovies();
+        } else {
+            showLoadingIndicator();
+        }
+    }
+
+    /**
+     * Helper method to bundle up view toggling.
+     * This one dismisses the items that show when there is no internet and replaces them with our roster.
+     */
+    private void showMovies(){
+        //mLoadingIndicator.setVisibility(View.INVISIBLE);
+        mEmptyDisplay.setVisibility(View.INVISIBLE);
+        mEmptyDisplaySubtext.setVisibility(View.INVISIBLE);
+        //mRetry.setVisibility(View.INVISIBLE);
+        mRecyclerView.setVisibility(View.VISIBLE);
+
+    }
+
+    /**
+     * Helper method to bundle up view toggling.
+     * This one informs our users that there is no internet and hides the empty roster.
+     */
+    private void showLoadingIndicator(){
+        mEmptyDisplay.setVisibility(View.VISIBLE);
+        mEmptyDisplaySubtext.setVisibility(View.VISIBLE);
+        mRecyclerView.setVisibility(View.INVISIBLE);
+    }
+
+    /**
+     * This method helps us check if our database is empty.
+     * @return True if the database is empty and false if it exists.
+     */
+    private boolean checkforDatabase(){
+        boolean empty = true;
+        MovieDatabaseHelper helper = new MovieDatabaseHelper(this);
+        SQLiteDatabase database = helper.getReadableDatabase();
+        String check = "SELECT COUNT(*) FROM movies";
+        Cursor cursor = database.rawQuery(check, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            empty = (cursor.getInt (0) == 0);
+        }
+        cursor.close();
+        return empty;
     }
 
     @Override
@@ -129,8 +183,9 @@ public class MainActivity extends AppCompatActivity
 
         switch (loaderId) {
             case POPULAR_MOVIE_LOADER:
+                Uri popularMovieQuery = MovieEntry.CONTENT_URI;
                 return new CursorLoader(this,
-                        MovieEntry.CONTENT_URI,
+                        popularMovieQuery,
                         MOVIE_PROJECTION,
                         null,
                         null,
@@ -252,7 +307,6 @@ public class MainActivity extends AppCompatActivity
                 mEmptyDisplay.setVisibility(View.INVISIBLE);
                 mEmptyDisplaySubtext.setVisibility(View.INVISIBLE);
                 mRecyclerView.setVisibility(View.VISIBLE);
-                new FetchTopRatedMovieData().execute();
                 //loadExtras();
             }
         }

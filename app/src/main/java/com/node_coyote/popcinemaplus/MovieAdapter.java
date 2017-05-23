@@ -36,11 +36,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     public class MovieAdapterViewHolder extends RecyclerView.ViewHolder implements OnClickListener {
 
         public final ImageView mGridMoviePoster;
-        public final TextView mGridMovieTitle;
 
         public MovieAdapterViewHolder(View itemView) {
             super(itemView);
-            mGridMovieTitle = (TextView) itemView.findViewById(R.id.grid_movie_title);
             mGridMoviePoster = (ImageView) itemView.findViewById(R.id.grid_movie_poster);
             itemView.setOnClickListener(this);
         }
