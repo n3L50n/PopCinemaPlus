@@ -1,4 +1,4 @@
-package com.node_coyote.popcinema;
+package com.node_coyote.popcinemaplus;
 
 import android.app.LoaderManager;
 import android.content.ContentValues;
@@ -18,9 +18,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.node_coyote.popcinema.data.MovieContract.MovieEntry;
-import com.node_coyote.popcinema.utility.JsonUtility;
-import com.node_coyote.popcinema.utility.NetworkUtility;
+import com.node_coyote.popcinemaplus.data.MovieContract.MovieEntry;
+import com.node_coyote.popcinemaplus.utility.JsonUtility;
+import com.node_coyote.popcinemaplus.utility.NetworkUtility;
 
 import java.net.URL;
 
@@ -109,13 +109,14 @@ public class MainActivity extends AppCompatActivity
         // Define a projection of columns from table.
         String[] projection = {
                 MovieEntry._ID,
-                MovieEntry.COLUMN_TITLE,
                 MovieEntry.COLUMN_POSTER,
-                MovieEntry.COLUMN_RATING,
-                MovieEntry.COLUMN_RELEASE_DATE,
                 MovieEntry.COLUMN_SUMMARY,
+                MovieEntry.COLUMN_RELEASE_DATE,
                 MovieEntry.COLUMN_MOVIE_ID,
+                MovieEntry.COLUMN_TITLE,
+                MovieEntry.COLUMN_VOTE_AVERAGE,
                 MovieEntry.COLUMN_TRAILER_SET,
+                MovieEntry.COLUMN_TRAILER,
                 MovieEntry.COLUMN_FAVORITE
         };
 
@@ -168,17 +169,17 @@ public class MainActivity extends AppCompatActivity
                 return null;
             }
         }
-//
-//        @Override
-//        protected void onPostExecute(ContentValues[] movieData) {
-////
-////            if (movieData != null) {
-////                mAdapter.setMovieData(movieData);
-////                mEmptyDisplay.setVisibility(View.INVISIBLE);
-////                mEmptyDisplaySubtext.setVisibility(View.INVISIBLE);
-////                mRecyclerView.setVisibility(View.VISIBLE);
-////            }
-//        }
+
+        @Override
+        protected void onPostExecute(ContentValues[] movieData) {
+
+            if (movieData != null) {
+                mAdapter.setMovieData(movieData);
+                mEmptyDisplay.setVisibility(View.INVISIBLE);
+                mEmptyDisplaySubtext.setVisibility(View.INVISIBLE);
+                mRecyclerView.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
     @Override

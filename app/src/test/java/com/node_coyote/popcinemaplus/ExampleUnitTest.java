@@ -1,4 +1,4 @@
-package com.node_coyote.popcinema;
+package com.node_coyote.popcinemaplus;
 
 import org.junit.Test;
 

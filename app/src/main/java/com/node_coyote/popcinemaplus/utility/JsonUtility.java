@@ -1,10 +1,10 @@
-package com.node_coyote.popcinema.utility;
+package com.node_coyote.popcinemaplus.utility;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.util.Log;
 
-import com.node_coyote.popcinema.data.MovieContract.MovieEntry;
+import com.node_coyote.popcinemaplus.data.MovieContract.MovieEntry;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,7 +31,7 @@ public final class JsonUtility {
 
         JSONObject root = new JSONObject(movieJsonString);
         JSONArray results = root.getJSONArray(MOVIE_RESULTS);
-        ContentValues[] parsedMovieValues = new ContentValues[root.length()];
+        ContentValues[] parsedMovieValues = new ContentValues[results.length()];
 
         try {
 
@@ -47,11 +47,11 @@ public final class JsonUtility {
                 long movieId = movie.getLong(MOVIE_ID);
 
                 ContentValues values = new ContentValues();
+                values.put(MovieEntry.COLUMN_TITLE, title);
                 values.put(MovieEntry.COLUMN_POSTER, poster);
                 values.put(MovieEntry.COLUMN_SUMMARY, summary);
-                values.put(MovieEntry.COLUMN_TITLE, title);
                 values.put(MovieEntry.COLUMN_RELEASE_DATE, release);
-                values.put(MovieEntry.COLUMN_RATING, topRated);
+                values.put(MovieEntry.COLUMN_VOTE_AVERAGE, topRated);
                 values.put(MovieEntry.COLUMN_MOVIE_ID, movieId);
 
                 parsedMovieValues[i] = values;
@@ -75,7 +75,7 @@ public final class JsonUtility {
         JSONObject root = new JSONObject(trailerJsonString);
         JSONArray results = root.getJSONArray(TRAILER_RESULTS);
 
-        ContentValues[] parsedTrailerValues = new ContentValues[root.length()];
+        ContentValues[] parsedTrailerValues = new ContentValues[results.length()];
 
         try {
 

@@ -1,4 +1,4 @@
-package com.node_coyote.popcinema.data;
+package com.node_coyote.popcinemaplus.data;
 
 import android.content.ContentProvider;
 import android.content.ContentUris;
@@ -10,7 +10,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.node_coyote.popcinema.data.MovieContract.MovieEntry;
+import com.node_coyote.popcinemaplus.data.MovieContract.MovieEntry;
 
 /**
  * Created by node_coyote on 5/16/17.
@@ -35,7 +35,6 @@ public class MovieProvider extends ContentProvider {
         sMatcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_MOVIE, MOVIE);
         sMatcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_MOVIE + "/#", MOVIE_ID);
     }
-
 
 
     // A database helper object.

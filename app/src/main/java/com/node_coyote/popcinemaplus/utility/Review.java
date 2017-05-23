@@ -1,4 +1,4 @@
-package com.node_coyote.popcinema.utility;
+package com.node_coyote.popcinemaplus.utility;
 
 /**
  * Created by node_coyote on 5/15/17.

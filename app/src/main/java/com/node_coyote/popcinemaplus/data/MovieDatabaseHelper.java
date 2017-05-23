@@ -1,9 +1,9 @@
-package com.node_coyote.popcinema.data;
+package com.node_coyote.popcinemaplus.data;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import com.node_coyote.popcinema.data.MovieContract.MovieEntry;
+import com.node_coyote.popcinemaplus.data.MovieContract.MovieEntry;
 
 /**
  * Created by node_coyote on 5/11/17.
@@ -25,6 +25,21 @@ public class MovieDatabaseHelper extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
+
+    private static final String SQL_CREATE_MOVIE_TABLE =
+
+            "CREATE TABLE " + MovieEntry.TABLE_NAME + " ("
+                    + MovieEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                    + MovieEntry.COLUMN_POSTER + " TEXT NOT NULL, "
+                    + MovieEntry.COLUMN_SUMMARY + " TEXT NOT NULL, "
+                    + MovieEntry.COLUMN_RELEASE_DATE + " TEXT NOT NULL, "
+                    + MovieEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, "
+                    + MovieEntry.COLUMN_TITLE + " TEXT NOT NULL, "
+                    + MovieEntry.COLUMN_VOTE_AVERAGE + " REAL, "
+                    + MovieEntry.COLUMN_TRAILER_SET + " TEXT, "
+                    + MovieEntry.COLUMN_TRAILER + " TEXT, "
+                    + MovieEntry.COLUMN_FAVORITE + " INTEGER NOT NULL DEFAULT 0 );";
+
     /**
      * This is a required method override that can help us create a sql command to create
      * our movies database
@@ -32,21 +47,6 @@ public class MovieDatabaseHelper extends SQLiteOpenHelper {
      */
     @Override
     public void onCreate(SQLiteDatabase database) {
-
-        final String SQL_CREATE_MOVIE_TABLE =
-
-                "CREATE TABLE " + MovieEntry.TABLE_NAME + " ("
-                + MovieEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + MovieEntry.COLUMN_MOVIE_ID + " INTEGER"
-                + MovieEntry.COLUMN_TITLE + " TEXT NOT NULL, "
-                + MovieEntry.COLUMN_SUMMARY + " TEXT "
-                + MovieEntry.COLUMN_POSTER + " TEXT "
-                + MovieEntry.COLUMN_RATING + " REAL "
-                + MovieEntry.COLUMN_RELEASE_DATE + " TEXT"
-                + MovieEntry.COLUMN_TRAILER + " TEXT "
-                + MovieEntry.COLUMN_TRAILER_SET + " TEXT "
-                + MovieEntry.COLUMN_FAVORITE + " INTEGER);";
-
 
             database.execSQL(SQL_CREATE_MOVIE_TABLE);
 

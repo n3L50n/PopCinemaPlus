@@ -1,4 +1,4 @@
-package com.node_coyote.popcinema.data;
+package com.node_coyote.popcinemaplus.data;
 
 import android.content.ContentResolver;
 import android.net.Uri;
@@ -13,7 +13,7 @@ public class MovieContract {
     // Empty constructor. Let's not instantiate the contract class.
     public MovieContract(){}
 
-    public static final String CONTENT_AUTHORITY = "com.node_coyote.popcinema.data";
+    public static final String CONTENT_AUTHORITY = "com.node_coyote.popcinemaplus.data";
 
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
@@ -42,39 +42,45 @@ public class MovieContract {
 
         /**
          * Type: INTEGER
-         * Unique identifier of a single movie (row) selection
+         * Unique identifier for a movie (row) in the database
          */
-        public static final String COLUMN_MOVIE_ID = "movie_id";
-
-        /**
-         * Type: TEXT
-         * The title of a single movie selection
-         */
-        public static final String COLUMN_TITLE = "title";
-
-        /**
-         * Type: TEXT
-         * The summary of a movie
-         */
-        public static final String COLUMN_SUMMARY = "summary";
+        public static final String _ID = BaseColumns._ID;
 
         /**
          * Type: TEXT
          * The path to the poster image
          */
-        public static final String COLUMN_POSTER = "poster";
+        public static final String COLUMN_POSTER = "poster_path";
 
         /**
-         * Type: REAL
-         * A float average of user votes on a movie, user ratings
+         * Type: TEXT
+         * The summary of a movie
          */
-        public static final String COLUMN_RATING = "rating";
+        public static final String COLUMN_SUMMARY = "overview";
 
         /**
          * Type: TEXT
          * The release date is a string
          */
-        public static final String COLUMN_RELEASE_DATE = "release";
+        public static final String COLUMN_RELEASE_DATE = "release_date";
+
+        /**
+         * Type: INTEGER
+         * Unique identifier of a single movie in the json
+         */
+        public static final String COLUMN_MOVIE_ID = "id";
+
+        /**
+         * Type: TEXT
+         * The title of a single movie selection
+         */
+        public static final String COLUMN_TITLE = "original_title";
+
+        /**
+         * Type: REAL
+         * A float average of user votes on a movie, user ratings
+         */
+        public static final String COLUMN_VOTE_AVERAGE = "vote_average";
 
         /**
          * Type: TEXT

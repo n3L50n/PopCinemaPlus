@@ -1,4 +1,4 @@
-package com.node_coyote.popcinema;
+package com.node_coyote.popcinemaplus;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.node_coyote.popcinema.utility.Review;
+import com.node_coyote.popcinemaplus.utility.Review;
 
 import java.util.ArrayList;
 

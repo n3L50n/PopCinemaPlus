@@ -1,4 +1,4 @@
-package com.node_coyote.popcinema;
+package com.node_coyote.popcinemaplus;
 
 import android.content.ContentValues;
 import android.content.Intent;
@@ -12,10 +12,10 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.node_coyote.popcinema.data.MovieContract;
-import com.node_coyote.popcinema.utility.JsonUtility;
-import com.node_coyote.popcinema.utility.NetworkUtility;
-import com.node_coyote.popcinema.utility.Review;
+import com.node_coyote.popcinemaplus.data.MovieContract;
+import com.node_coyote.popcinemaplus.utility.JsonUtility;
+import com.node_coyote.popcinemaplus.utility.NetworkUtility;
+import com.node_coyote.popcinemaplus.utility.Review;
 import com.squareup.picasso.Picasso;
 
 import java.net.URL;

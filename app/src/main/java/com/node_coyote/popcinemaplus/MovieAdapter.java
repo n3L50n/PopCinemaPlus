@@ -1,4 +1,4 @@
-package com.node_coyote.popcinema;
+package com.node_coyote.popcinemaplus;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -11,7 +11,7 @@ import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.node_coyote.popcinema.data.MovieContract.MovieEntry;
+import com.node_coyote.popcinemaplus.data.MovieContract.MovieEntry;
 import com.squareup.picasso.Picasso;
 
 
@@ -84,17 +84,14 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 
         mCursor.moveToPosition(position);
 
-        int titleColumnIndex = mCursor.getColumnIndex(MovieEntry.COLUMN_TITLE);
         int posterColumnIndex = mCursor.getColumnIndex(MovieEntry.COLUMN_POSTER);
 
-        String movieTitle = mCursor.getString(titleColumnIndex);
         String posterPath = mCursor.getString(posterColumnIndex);
         String posterBaseUrl = "http://image.tmdb.org/t/p/w342/";
         String fullPosterUrl = posterBaseUrl + posterPath;
 
         if (!fullPosterUrl.isEmpty() && fullPosterUrl.length() != 0) {
             Picasso.with(holder.mGridMoviePoster.getContext()).load(fullPosterUrl).into(holder.mGridMoviePoster);
-            holder.mGridMovieTitle.setText(movieTitle);
         }
 
     }

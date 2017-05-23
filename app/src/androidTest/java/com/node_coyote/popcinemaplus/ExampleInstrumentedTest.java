@@ -1,4 +1,4 @@
-package com.node_coyote.popcinema;
+package com.node_coyote.popcinemaplus;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
