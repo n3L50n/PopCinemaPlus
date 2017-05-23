@@ -26,6 +26,7 @@ public final class JsonUtility {
         final String OVERVIEW = "overview";
         final String TITLE = "original_title";
         final String TOP_RATED = "vote_average";
+        final String POPULARITY = "popularity";
         final String RELEASE_DATE = "release_date";
         final String MOVIE_ID = "id";
 
@@ -43,16 +44,19 @@ public final class JsonUtility {
                 String summary = movie.getString(OVERVIEW);
                 String title = movie.getString(TITLE);
                 String release = movie.getString(RELEASE_DATE);
+                double popularity = movie.getDouble(POPULARITY);
                 double topRated = movie.getDouble(TOP_RATED);
                 long movieId = movie.getLong(MOVIE_ID);
 
                 ContentValues values = new ContentValues();
-                values.put(MovieEntry.COLUMN_TITLE, title);
+
                 values.put(MovieEntry.COLUMN_POSTER, poster);
                 values.put(MovieEntry.COLUMN_SUMMARY, summary);
                 values.put(MovieEntry.COLUMN_RELEASE_DATE, release);
-                values.put(MovieEntry.COLUMN_VOTE_AVERAGE, topRated);
                 values.put(MovieEntry.COLUMN_MOVIE_ID, movieId);
+                values.put(MovieEntry.COLUMN_TITLE, title);
+                values.put(MovieEntry.COLUMN_POPULARITY, popularity);
+                values.put(MovieEntry.COLUMN_VOTE_AVERAGE, topRated);
 
                 parsedMovieValues[i] = values;
             }

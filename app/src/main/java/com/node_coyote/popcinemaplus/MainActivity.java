@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.node_coyote.popcinemaplus.data.MovieContract.MovieEntry;
+import com.node_coyote.popcinemaplus.data.MovieDatabaseHelper;
 import com.node_coyote.popcinemaplus.utility.JsonUtility;
 import com.node_coyote.popcinemaplus.utility.NetworkUtility;
 
@@ -50,11 +51,26 @@ public class MainActivity extends AppCompatActivity
     /**
      * Use as an arbitrary identifier for the movie loader data.
      */
-    private static final int MOVIE_LOADER = 42;
+    private static final int POPULAR_MOVIE_LOADER = 42;
+    private static final int TOP_RATED_LOADER = 9;
 
     private static final int SORT_POPULAR_MOVIES = 0;
     private static final int SORT_TOP_RATED_MOVIES = 1;
     private static final int SORT_FAVORITES = 2;
+
+    private static final String[] MOVIE_PROJECTION = {
+                MovieEntry._ID,
+                MovieEntry.COLUMN_POSTER,
+                MovieEntry.COLUMN_SUMMARY,
+                MovieEntry.COLUMN_RELEASE_DATE,
+                MovieEntry.COLUMN_MOVIE_ID,
+                MovieEntry.COLUMN_TITLE,
+                MovieEntry.COLUMN_POPULARITY,
+                MovieEntry.COLUMN_VOTE_AVERAGE,
+                MovieEntry.COLUMN_TRAILER_SET,
+                MovieEntry.COLUMN_TRAILER,
+                MovieEntry.COLUMN_FAVORITE
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +99,7 @@ public class MainActivity extends AppCompatActivity
 
         mRecyclerView.setAdapter(mAdapter);
 
-        getLoaderManager().initLoader(MOVIE_LOADER, null, MainActivity.this);
+        getLoaderManager().initLoader(POPULAR_MOVIE_LOADER, null, MainActivity.this);
         loadMovieData();
     }
 
@@ -109,27 +125,28 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        // Define a projection of columns from table.
-        String[] projection = {
-                MovieEntry._ID,
-                MovieEntry.COLUMN_POSTER,
-                MovieEntry.COLUMN_SUMMARY,
-                MovieEntry.COLUMN_RELEASE_DATE,
-                MovieEntry.COLUMN_MOVIE_ID,
-                MovieEntry.COLUMN_TITLE,
-                MovieEntry.COLUMN_VOTE_AVERAGE,
-                MovieEntry.COLUMN_TRAILER_SET,
-                MovieEntry.COLUMN_TRAILER,
-                MovieEntry.COLUMN_FAVORITE
-        };
+    public Loader<Cursor> onCreateLoader(int loaderId, Bundle args) {
 
-        return new CursorLoader(this,
-                MovieEntry.CONTENT_URI,
-                projection,
-                null,
-                null,
-                null);
+        switch (loaderId) {
+            case POPULAR_MOVIE_LOADER:
+                return new CursorLoader(this,
+                        MovieEntry.CONTENT_URI,
+                        MOVIE_PROJECTION,
+                        null,
+                        null,
+                        null);
+
+            case TOP_RATED_LOADER:
+                String selection = MovieEntry.COLUMN_VOTE_AVERAGE;
+                return new CursorLoader(this,
+                        MovieEntry.CONTENT_URI,
+                        MOVIE_PROJECTION,
+                        selection,
+                        null,
+                        null);
+            default:
+                throw new RuntimeException("Laoder not implemented" + loaderId);
+        }
     }
 
     @Override
@@ -177,20 +194,25 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void sort(int parameter){
+
+        String sortOrder = null;
         switch (parameter) {
             case SORT_POPULAR_MOVIES:
                 //query() popular
-
+                sortOrder = MovieEntry.COLUMN_POPULARITY + " ASC";
                 break;
             case SORT_TOP_RATED_MOVIES:
                 // query() top rated
-
+                sortOrder = MovieEntry.COLUMN_VOTE_AVERAGE + " ASC";
                 break;
             case SORT_FAVORITES:
                 // query() favorites
-
+                // TODO  if a movie has a 1 in the favorite column, show it.
+                sortOrder = MovieEntry.COLUMN_FAVORITE;
                 break;
         }
+        MovieDatabaseHelper helper = new MovieDatabaseHelper(getApplicationContext());
+        mAdapter.swapCursor(helper.query(MOVIE_PROJECTION, sortOrder));
     }
 
     /**
@@ -207,19 +229,11 @@ public class MainActivity extends AppCompatActivity
         protected ContentValues[] doInBackground(String... params) {
 
             URL popularMovieUrl = NetworkUtility.buildPopularMovieUrl();
-            URL topRatedMovieUrl = NetworkUtility.buildTopRatedMovieUrl();
-            URL movieTrailersUrl = NetworkUtility.buildVideoDatasetUrl();
-            URL movieReviewsUrl = NetworkUtility.buildReviewDatasetUrl();
 
             try {
                 // By default, the app opens with Popular Movies. It is up to the user to toggle to top rated
                 String jsonPopularMovieResponse = NetworkUtility.getResponseFromHttp(popularMovieUrl);
-                String jsonTopRatedResponse = NetworkUtility.getResponseFromHttp(topRatedMovieUrl);
-                String jsonTrailerResponse = NetworkUtility.getResponseFromHttp(movieTrailersUrl);
-                String jsonReviewResponse = NetworkUtility.getResponseFromHttp(movieReviewsUrl);
                 mMovieData = JsonUtility.getMovieStringsFromJson(MainActivity.this, jsonPopularMovieResponse);
-
-                getLoaderManager().initLoader(MOVIE_LOADER, null, MainActivity.this);
 
                 return mMovieData;
 
@@ -238,9 +252,82 @@ public class MainActivity extends AppCompatActivity
                 mEmptyDisplay.setVisibility(View.INVISIBLE);
                 mEmptyDisplaySubtext.setVisibility(View.INVISIBLE);
                 mRecyclerView.setVisibility(View.VISIBLE);
+                new FetchTopRatedMovieData().execute();
+                //loadExtras();
+            }
+        }
+    }
+
+    /**
+     * Class to help move the data request off the main thread
+     */
+    public class FetchTopRatedMovieData extends AsyncTask<String, Void, ContentValues[]> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected ContentValues[] doInBackground(String... params) {
+
+            URL topRatedMovieUrl = NetworkUtility.buildTopRatedMovieUrl();
+
+            try {
+                // By default, the app opens with Popular Movies. It is up to the user to toggle to top rated
+                String jsonTopRatedResponse = NetworkUtility.getResponseFromHttp(topRatedMovieUrl);
+                mMovieData = JsonUtility.getMovieStringsFromJson(MainActivity.this, jsonTopRatedResponse);
+                return mMovieData;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
             }
         }
 
+        @Override
+        protected void onPostExecute(ContentValues[] topRatedMovieData) {
+
+            if (topRatedMovieData != null) {
+                //mAdapter.swapCursor(topRatedMovieData);
+                mAdapter.setMovieData(topRatedMovieData);
+            }
+        }
+    }
+
+    /**
+     * Class to help move the trailers and reviews request off the main thread
+     */
+    public class FetchTrailerReviewData extends AsyncTask<String, Void, ContentValues[]> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected ContentValues[] doInBackground(String... params) {
+
+            URL movieTrailersUrl = NetworkUtility.buildVideoDatasetUrl(MovieEntry.COLUMN_MOVIE_ID);
+            URL movieReviewsUrl = NetworkUtility.buildReviewDatasetUrl(MovieEntry.COLUMN_MOVIE_ID);
+
+            try {
+                String jsonTrailerResponse = NetworkUtility.getResponseFromHttp(movieTrailersUrl);
+                String jsonReviewResponse = NetworkUtility.getResponseFromHttp(movieReviewsUrl);
+                mMovieData = JsonUtility.getTrailerItemsFromJson(MainActivity.this, jsonTrailerResponse);
+                mMovieData = JsonUtility.getReviewItemsFromJson(MainActivity.this, jsonReviewResponse);
+
+                return mMovieData;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+    }
+
+    private void loadExtras() {
+        new FetchTrailerReviewData().execute();
     }
 
 }

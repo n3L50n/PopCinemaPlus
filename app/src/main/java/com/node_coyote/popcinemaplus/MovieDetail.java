@@ -15,7 +15,6 @@ import android.widget.TextView;
 import com.node_coyote.popcinemaplus.data.MovieContract;
 import com.node_coyote.popcinemaplus.utility.JsonUtility;
 import com.node_coyote.popcinemaplus.utility.NetworkUtility;
-import com.node_coyote.popcinemaplus.utility.Review;
 import com.squareup.picasso.Picasso;
 
 import java.net.URL;
@@ -35,9 +34,9 @@ public class MovieDetail extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
 
-        mAdapter = new ReviewAdapter(this, new ArrayList<Review>());
+       // mAdapter = new ReviewAdapter(this, new ArrayList<Review>());
         ListView listView = (ListView) findViewById(R.id.reviews_list_view);
-        listView.setAdapter(mAdapter);
+        //listView.setAdapter(mAdapter);
 
         // Find movie Detail TextViews
         TextView movieTitleTextView = (TextView) findViewById(R.id.movie_detail_title);

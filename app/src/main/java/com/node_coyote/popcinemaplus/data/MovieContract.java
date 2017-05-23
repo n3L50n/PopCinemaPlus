@@ -78,6 +78,12 @@ public class MovieContract {
 
         /**
          * Type: REAL
+         * The level of popularity of a movie selection, described using a float.
+         */
+        public static final String COLUMN_POPULARITY = "popularity";
+
+        /**
+         * Type: REAL
          * A float average of user votes on a movie, user ratings
          */
         public static final String COLUMN_VOTE_AVERAGE = "vote_average";

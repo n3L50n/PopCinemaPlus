@@ -1,8 +1,11 @@
 package com.node_coyote.popcinemaplus.data;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteQueryBuilder;
+
 import com.node_coyote.popcinemaplus.data.MovieContract.MovieEntry;
 
 /**
@@ -35,6 +38,7 @@ public class MovieDatabaseHelper extends SQLiteOpenHelper {
                     + MovieEntry.COLUMN_RELEASE_DATE + " TEXT NOT NULL, "
                     + MovieEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, "
                     + MovieEntry.COLUMN_TITLE + " TEXT NOT NULL, "
+                    + MovieEntry.COLUMN_POPULARITY + " REAL, "
                     + MovieEntry.COLUMN_VOTE_AVERAGE + " REAL, "
                     + MovieEntry.COLUMN_TRAILER_SET + " TEXT, "
                     + MovieEntry.COLUMN_TRAILER + " TEXT, "
@@ -62,5 +66,23 @@ public class MovieDatabaseHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase database, int oldVersion, int newVersion) {
         database.execSQL("DROP TABLE IF EXISTS " + MovieEntry.TABLE_NAME);
         onCreate(database);
+    }
+
+    public Cursor query(String[] columns, String sortOrder) {
+
+        SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
+        builder.setTables(MovieEntry.TABLE_NAME);
+
+        Cursor cursor = builder.query(getReadableDatabase(), columns,
+                null, null, null, null, sortOrder);
+
+        if (cursor == null) {
+            return null;
+        } else if (cursor.moveToFirst()){
+            cursor.close();
+            return null;
+        }
+        return cursor;
+
     }
 }
