@@ -78,7 +78,7 @@ public class MovieDatabaseHelper extends SQLiteOpenHelper {
 
         if (cursor == null) {
             return null;
-        } else if (cursor.moveToFirst()){
+        } else if (!cursor.moveToFirst()){
             cursor.close();
             return null;
         }

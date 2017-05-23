@@ -56,25 +56,24 @@ public class MainActivity extends AppCompatActivity
     /**
      * Use as an arbitrary identifier for the movie loader data.
      */
-    private static final int POPULAR_MOVIE_LOADER = 42;
-    private static final int TOP_RATED_LOADER = 9;
+    private static final int MOVIE_LOADER = 42;
 
     private static final int SORT_POPULAR_MOVIES = 0;
     private static final int SORT_TOP_RATED_MOVIES = 1;
     private static final int SORT_FAVORITES = 2;
 
     private static final String[] MOVIE_PROJECTION = {
-                MovieEntry._ID,
-                MovieEntry.COLUMN_POSTER,
-                MovieEntry.COLUMN_SUMMARY,
-                MovieEntry.COLUMN_RELEASE_DATE,
-                MovieEntry.COLUMN_MOVIE_ID,
-                MovieEntry.COLUMN_TITLE,
-                MovieEntry.COLUMN_POPULARITY,
-                MovieEntry.COLUMN_VOTE_AVERAGE,
-                MovieEntry.COLUMN_TRAILER_SET,
-                MovieEntry.COLUMN_TRAILER,
-                MovieEntry.COLUMN_FAVORITE
+            MovieEntry._ID,
+            MovieEntry.COLUMN_POSTER,
+            MovieEntry.COLUMN_SUMMARY,
+            MovieEntry.COLUMN_RELEASE_DATE,
+            MovieEntry.COLUMN_MOVIE_ID,
+            MovieEntry.COLUMN_TITLE,
+            MovieEntry.COLUMN_POPULARITY,
+            MovieEntry.COLUMN_VOTE_AVERAGE,
+            MovieEntry.COLUMN_TRAILER_SET,
+            MovieEntry.COLUMN_TRAILER,
+            MovieEntry.COLUMN_FAVORITE
     };
 
     @Override
@@ -90,17 +89,15 @@ public class MainActivity extends AppCompatActivity
 
         int numberOfMovieColumns = 2;
 
-        if (checkforDatabase()){
+        if (checkforDatabase()) {
             loadMovieData();
         } else {
-            getLoaderManager().restartLoader(POPULAR_MOVIE_LOADER, null, this);
+            getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
         }
-
 
         //  Create a grid layout manager
         GridLayoutManager layoutManager = new GridLayoutManager(MainActivity.this, numberOfMovieColumns);
         mRecyclerView.setLayoutManager(layoutManager);
-
 
         mAdapter = new MovieAdapter(this);
 
@@ -117,7 +114,7 @@ public class MainActivity extends AppCompatActivity
         if (networkInfo != null && networkInfo.isConnected()) {
             new FetchMovieData().execute();
             new FetchTopRatedMovieData().execute();
-            getLoaderManager().initLoader(POPULAR_MOVIE_LOADER, null, this);
+            getLoaderManager().initLoader(MOVIE_LOADER, null, this);
             showMovies();
         } else {
             showLoadingIndicator();
@@ -128,7 +125,7 @@ public class MainActivity extends AppCompatActivity
      * Helper method to bundle up view toggling.
      * This one dismisses the items that show when there is no internet and replaces them with our roster.
      */
-    private void showMovies(){
+    private void showMovies() {
         //mLoadingIndicator.setVisibility(View.INVISIBLE);
         mEmptyDisplay.setVisibility(View.INVISIBLE);
         mEmptyDisplaySubtext.setVisibility(View.INVISIBLE);
@@ -141,7 +138,7 @@ public class MainActivity extends AppCompatActivity
      * Helper method to bundle up view toggling.
      * This one informs our users that there is no internet and hides the empty roster.
      */
-    private void showLoadingIndicator(){
+    private void showLoadingIndicator() {
         mEmptyDisplay.setVisibility(View.VISIBLE);
         mEmptyDisplaySubtext.setVisibility(View.VISIBLE);
         mRecyclerView.setVisibility(View.INVISIBLE);
@@ -149,16 +146,17 @@ public class MainActivity extends AppCompatActivity
 
     /**
      * This method helps us check if our database is empty.
+     *
      * @return True if the database is empty and false if it exists.
      */
-    private boolean checkforDatabase(){
+    private boolean checkforDatabase() {
         boolean empty = true;
         MovieDatabaseHelper helper = new MovieDatabaseHelper(this);
         SQLiteDatabase database = helper.getReadableDatabase();
         String check = "SELECT COUNT(*) FROM movies";
         Cursor cursor = database.rawQuery(check, null);
         if (cursor != null && cursor.moveToFirst()) {
-            empty = (cursor.getInt (0) == 0);
+            empty = (cursor.getInt(0) == 0);
         }
         cursor.close();
         return empty;
@@ -182,21 +180,11 @@ public class MainActivity extends AppCompatActivity
     public Loader<Cursor> onCreateLoader(int loaderId, Bundle args) {
 
         switch (loaderId) {
-            case POPULAR_MOVIE_LOADER:
-                Uri popularMovieQuery = MovieEntry.CONTENT_URI;
-                return new CursorLoader(this,
-                        popularMovieQuery,
-                        MOVIE_PROJECTION,
-                        null,
-                        null,
-                        null);
-
-            case TOP_RATED_LOADER:
-                String selection = MovieEntry.COLUMN_VOTE_AVERAGE;
+            case MOVIE_LOADER:
                 return new CursorLoader(this,
                         MovieEntry.CONTENT_URI,
                         MOVIE_PROJECTION,
-                        selection,
+                        null,
                         null,
                         null);
             default:
@@ -209,7 +197,7 @@ public class MainActivity extends AppCompatActivity
         mAdapter.swapCursor(data);
         if (mPosition == RecyclerView.NO_POSITION) mPosition = 0;
         mRecyclerView.smoothScrollToPosition(mPosition);
-        //if (data.getCount() != 0) showMoviesGrid();
+        if (data.getCount() != 0) showMovies();
     }
 
     @Override
@@ -248,17 +236,19 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void sort(int parameter){
+    private void sort(int parameter) {
 
         String sortOrder = null;
         switch (parameter) {
             case SORT_POPULAR_MOVIES:
                 //query() popular
-                sortOrder = MovieEntry.COLUMN_POPULARITY + " ASC";
+
+                sortOrder = MovieEntry.COLUMN_POPULARITY + " DESC";
                 break;
             case SORT_TOP_RATED_MOVIES:
                 // query() top rated
-                sortOrder = MovieEntry.COLUMN_VOTE_AVERAGE + " ASC";
+
+                sortOrder = MovieEntry.COLUMN_VOTE_AVERAGE + " DESC";
                 break;
             case SORT_FAVORITES:
                 // query() favorites
@@ -268,6 +258,7 @@ public class MainActivity extends AppCompatActivity
         }
         MovieDatabaseHelper helper = new MovieDatabaseHelper(getApplicationContext());
         mAdapter.swapCursor(helper.query(MOVIE_PROJECTION, sortOrder));
+
     }
 
     /**
@@ -304,9 +295,7 @@ public class MainActivity extends AppCompatActivity
             if (movieData != null) {
                 //mAdapter.swapCursor(movieData);
                 mAdapter.setMovieData(movieData);
-                mEmptyDisplay.setVisibility(View.INVISIBLE);
-                mEmptyDisplaySubtext.setVisibility(View.INVISIBLE);
-                mRecyclerView.setVisibility(View.VISIBLE);
+                showMovies();
                 //loadExtras();
             }
         }
