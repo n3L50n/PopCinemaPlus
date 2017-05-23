@@ -52,6 +52,10 @@ public class MainActivity extends AppCompatActivity
      */
     private static final int MOVIE_LOADER = 42;
 
+    private static final int SORT_POPULAR_MOVIES = 0;
+    private static final int SORT_TOP_RATED_MOVIES = 1;
+    private static final int SORT_FAVORITES = 2;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -141,47 +145,6 @@ public class MainActivity extends AppCompatActivity
         mAdapter.swapCursor(null);
     }
 
-    /**
-     * Class to help move the popular request off the main thread
-     */
-    public class FetchMovieData extends AsyncTask<String, Void, ContentValues[]> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected ContentValues[] doInBackground(String... params) {
-
-            URL popularMovieUrl = NetworkUtility.buildPopularMovieUrl();
-
-            try {
-                // By default, the app opens with Popular Movies. It is up to the user to toggle to top rated
-                String jsonPopularMovieResponse = NetworkUtility.getResponseFromHttp(popularMovieUrl);
-
-                mMovieData = JsonUtility.getMovieStringsFromJson(MainActivity.this, jsonPopularMovieResponse);
-
-                return mMovieData;
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(ContentValues[] movieData) {
-
-            if (movieData != null) {
-                mAdapter.setMovieData(movieData);
-                mEmptyDisplay.setVisibility(View.INVISIBLE);
-                mEmptyDisplaySubtext.setVisibility(View.INVISIBLE);
-                mRecyclerView.setVisibility(View.VISIBLE);
-            }
-        }
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -197,27 +160,43 @@ public class MainActivity extends AppCompatActivity
 
         switch (id) {
             case R.id.action_popular:
-                // Fetch a sort by popularity
-                loadMovieData();
+                // Sort by popularity
+                sort(SORT_POPULAR_MOVIES);
                 return true;
             case R.id.action_top_rated:
-                // Fetch a sort by top rated
-                loadTopRated();
+                // Sort by top rated
+                sort(SORT_TOP_RATED_MOVIES);
+                return true;
+            case R.id.action_favorites:
+                // Sort by favorites
+                sort(SORT_FAVORITES);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
-
         }
     }
 
-    public void loadTopRated() {
-        new FetchTopRatedMovieData().execute();
+    private void sort(int parameter){
+        switch (parameter) {
+            case SORT_POPULAR_MOVIES:
+                //query() popular
+
+                break;
+            case SORT_TOP_RATED_MOVIES:
+                // query() top rated
+
+                break;
+            case SORT_FAVORITES:
+                // query() favorites
+
+                break;
+        }
     }
 
     /**
-     * Class to help move the top rated request off the main thread
+     * Class to help move the data request off the main thread
      */
-    public class FetchTopRatedMovieData extends AsyncTask<String, Void, ContentValues[]> {
+    public class FetchMovieData extends AsyncTask<String, Void, ContentValues[]> {
 
         @Override
         protected void onPreExecute() {
@@ -227,12 +206,17 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected ContentValues[] doInBackground(String... params) {
 
+            URL popularMovieUrl = NetworkUtility.buildPopularMovieUrl();
             URL topRatedMovieUrl = NetworkUtility.buildTopRatedMovieUrl();
+            URL movieTrailersUrl = NetworkUtility.buildVideoDatasetUrl();
+            URL movieReviewsUrl = NetworkUtility.buildReviewDatasetUrl();
 
             try {
                 // By default, the app opens with Popular Movies. It is up to the user to toggle to top rated
-                String jsonPopularMovieResponse = NetworkUtility.getResponseFromHttp(topRatedMovieUrl);
-
+                String jsonPopularMovieResponse = NetworkUtility.getResponseFromHttp(popularMovieUrl);
+                String jsonTopRatedResponse = NetworkUtility.getResponseFromHttp(topRatedMovieUrl);
+                String jsonTrailerResponse = NetworkUtility.getResponseFromHttp(movieTrailersUrl);
+                String jsonReviewResponse = NetworkUtility.getResponseFromHttp(movieReviewsUrl);
                 mMovieData = JsonUtility.getMovieStringsFromJson(MainActivity.this, jsonPopularMovieResponse);
 
                 getLoaderManager().initLoader(MOVIE_LOADER, null, MainActivity.this);
@@ -245,17 +229,17 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-//        @Override
-//        protected void onPostExecute(ContentValues[] movieData) {
-//
-//            if (movieData != null) {
-//                //mAdapter.swapCursor(movieData);
-//                mAdapter.setMovieData(movieData);
-//                mEmptyDisplay.setVisibility(View.INVISIBLE);
-//                mEmptyDisplaySubtext.setVisibility(View.INVISIBLE);
-//                mRecyclerView.setVisibility(View.VISIBLE);
-//            }
-//        }
+        @Override
+        protected void onPostExecute(ContentValues[] movieData) {
+
+            if (movieData != null) {
+                //mAdapter.swapCursor(movieData);
+                mAdapter.setMovieData(movieData);
+                mEmptyDisplay.setVisibility(View.INVISIBLE);
+                mEmptyDisplaySubtext.setVisibility(View.INVISIBLE);
+                mRecyclerView.setVisibility(View.VISIBLE);
+            }
+        }
 
     }
 

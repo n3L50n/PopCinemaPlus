@@ -2,6 +2,7 @@
     <string name="app_name">PopCinema</string>
     <string name="menu_title_popular">Popular</string>
     <string name="menu_title_top_rated">Top Rated</string>
+    <string name="menu_title_favorites">Favorites</string>
 
     <!--Content Descriptions for accessibility-->
     <string name="grid_movie_poster_content_description">An image of a movie poster</string>
