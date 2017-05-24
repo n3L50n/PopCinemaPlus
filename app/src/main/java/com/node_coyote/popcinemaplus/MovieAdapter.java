@@ -1,8 +1,10 @@
 package com.node_coyote.popcinemaplus;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,7 +32,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
      * Interface to receive onClick messages
      */
     public interface MovieAdapterOnClickHandler {
-        void onClick(String[] movieData);
+        void onClick(Uri movieDataUri);
     }
 
     public class MovieAdapterViewHolder extends RecyclerView.ViewHolder implements OnClickListener {
@@ -47,6 +49,11 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
         public void onClick(View view) {
             int adapterPosition = getAdapterPosition();
 
+            mCursor.moveToPosition(adapterPosition);
+
+            int rowIdColumnIndex = mCursor.getColumnIndex(MovieEntry._ID);
+            final long rowId = mCursor.getLong(rowIdColumnIndex);
+
 //            String[] movieData = {
 //                    mMovieData.get(adapterPosition).getTitle(),
 //                    mMovieData.get(adapterPosition).getSummary(),
@@ -56,7 +63,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 //                    mMovieData.get(adapterPosition).getMovieId()
 //            };
 
-            //mClickHandler.onClick(movieData);
+            Uri uri = ContentUris.withAppendedId(MovieEntry.CONTENT_URI, rowId);
+            mClickHandler.onClick(uri);
         }
     }
 

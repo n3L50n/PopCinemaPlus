@@ -163,7 +163,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onClick(String[] movieData) {
+    public void onClick(Uri movieDataUri) {
 
         // Where the click is coming from
         Context context = this;
@@ -171,7 +171,7 @@ public class MainActivity extends AppCompatActivity
         Class destination = MovieDetail.class;
         // Create a new intent
         Intent intent = new Intent(context, destination);
-        intent.putExtra(Intent.EXTRA_TEXT, movieData);
+        intent.setData(movieDataUri);
         startActivity(intent);
 
     }
@@ -188,7 +188,7 @@ public class MainActivity extends AppCompatActivity
                         null,
                         null);
             default:
-                throw new RuntimeException("Laoder not implemented" + loaderId);
+                throw new RuntimeException("Loader not implemented" + loaderId);
         }
     }
 
@@ -253,6 +253,7 @@ public class MainActivity extends AppCompatActivity
             case SORT_FAVORITES:
                 // query() favorites
                 // TODO  if a movie has a 1 in the favorite column, show it.
+                // TODO maybe move to separate favoritesQuery method?
                 sortOrder = MovieEntry.COLUMN_FAVORITE;
                 break;
         }
