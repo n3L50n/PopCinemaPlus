@@ -105,18 +105,17 @@ public class MovieDetail extends AppCompatActivity implements LoaderManager.Load
 
                 new FetchTrailerData().execute(mTrailerUrlSet);
                 new FetchReviewData().execute(mReviewUrlSet);
+                 **/
 
                 ImageButton playTrailerButton = (ImageButton) findViewById(R.id.watch_icon_button);
                 playTrailerButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        //Uri y = Uri.parse(mTrailerResults.get(0));
-                        Uri y = Uri.parse(MovieContract.MovieEntry.COLUMN_TRAILER);
+                        Uri y = Uri.parse(MovieEntry.COLUMN_TRAILER);
                         Intent trailerIntent = new Intent(Intent.ACTION_VIEW, y);
                         startActivity(trailerIntent);
                     }
                 });
-                 **/
            // }
         }
 

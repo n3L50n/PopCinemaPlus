@@ -54,15 +54,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
             int rowIdColumnIndex = mCursor.getColumnIndex(MovieEntry._ID);
             final long rowId = mCursor.getLong(rowIdColumnIndex);
 
-//            String[] movieData = {
-//                    mMovieData.get(adapterPosition).getTitle(),
-//                    mMovieData.get(adapterPosition).getSummary(),
-//                    mMovieData.get(adapterPosition).getRelease(),
-//                    mMovieData.get(adapterPosition).getPosterPath(),
-//                    mMovieData.get(adapterPosition).getTopRated(),
-//                    mMovieData.get(adapterPosition).getMovieId()
-//            };
-
             Uri uri = ContentUris.withAppendedId(MovieEntry.CONTENT_URI, rowId);
             mClickHandler.onClick(uri);
         }
@@ -86,8 +77,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     @Override
     public void onBindViewHolder(MovieAdapterViewHolder holder, int position) {
 
-        // Set the views of the main page grid items with title and poster image.
-
+        // Set the views of the main page grid items with a poster image.
         mCursor.moveToPosition(position);
 
         int posterColumnIndex = mCursor.getColumnIndex(MovieEntry.COLUMN_POSTER);
