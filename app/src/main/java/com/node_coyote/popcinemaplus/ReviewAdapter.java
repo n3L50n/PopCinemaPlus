@@ -8,12 +8,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.node_coyote.popcinemaplus.data.MovieContract.MovieEntry;
 
-import java.util.ArrayList;
 
 /**
  * Created by node_coyote on 5/15/17.
@@ -22,45 +20,18 @@ import java.util.ArrayList;
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewAdapterViewHolder>{
 
     private Cursor mCursor;
+    public TextView mAuthorView;
+    public TextView mContentView;
 
     public class ReviewAdapterViewHolder extends RecyclerView.ViewHolder {
 
         public ReviewAdapterViewHolder(View itemView) {
             super(itemView);
+            mAuthorView = (TextView) itemView.findViewById(R.id.author);
+            mContentView = (TextView) itemView.findViewById(R.id.content);
+
         }
     }
-
-//    public ReviewAdapter(@NonNull Context context, Cursor cursor) {
-//        super(context, 0, cursor);
-//    }
-//
-//    @NonNull
-//    @Override
-//    public View getView(int position, @Nullable View listItem, @NonNull ViewGroup parent) {
-//
-//        if (listItem == null) {
-//            listItem = LayoutInflater.from(getContext()).inflate(R.layout.list_item_review, parent, false);
-//        }
-//
-//
-//
-//        final Review currentReview = getItem(position);
-//
-//        String currentAuthor = currentReview.getAuthor();
-//
-//
-//        if (currentAuthor != null) {
-//            authorTextView.setText(currentAuthor);
-//        }
-//
-//        String currentContent = currentReview.getContent();
-//        TextView contentTextView = (TextView) listItem.findViewById(R.id.content);
-//        if (currentContent != null) {
-//            contentTextView.setText(currentContent);
-//        }
-//
-//        return listItem;
-//    }
 
     @Override
     public ReviewAdapterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -74,10 +45,13 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewAdap
     public void onBindViewHolder(ReviewAdapterViewHolder holder, int position) {
 
         mCursor.moveToPosition(position);
-        //int reviewColumnIndex = mCursor.getColumnIndex(MovieEntry.);
+        int authorColumnIndex = mCursor.getColumnIndex(MovieEntry.COLUMN_AUTHOR);
+        int contentColumnIndex = mCursor.getColumnIndex(MovieEntry.COLUMN_CONTENT);
+        String author = mCursor.getString(authorColumnIndex);
+        String content = mCursor.getString(contentColumnIndex);
 
-        //TextView authorTextView = (TextView) findViewById(R.id.author);
-
+        mAuthorView.setText(author);
+        mContentView.setText(content);
     }
 
     @Override

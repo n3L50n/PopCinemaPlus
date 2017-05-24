@@ -40,12 +40,12 @@
             android:layout_width="0dp"
             android:layout_height="200dp"
             android:layout_gravity="center|top"
-            android:layout_weight="1"
-            android:layout_marginTop="@dimen/general_margin_padding"
+            android:layout_marginEnd="@dimen/small_margin_padding"
+            android:layout_marginLeft="0dp"
             android:layout_marginRight="@dimen/small_margin_padding"
             android:layout_marginStart="0dp"
-            android:layout_marginLeft="0dp"
-            android:layout_marginEnd="@dimen/small_margin_padding"
+            android:layout_marginTop="@dimen/general_margin_padding"
+            android:layout_weight="1"
             android:background="@color/movie_background"
             android:contentDescription="@string/grid_movie_poster_content_description" />
     </LinearLayout>
@@ -107,17 +107,18 @@
         android:layout_margin="@dimen/general_margin_padding"
         android:gravity="center"
         android:text="@string/reviews_label"
-        android:textColor="@color/colorAccent"/>
+        android:textColor="@color/colorAccent" />
 
     <TextView
-        android:visibility="invisible"
+        android:id="@+id/empty_reviews_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center"
-        android:id="@+id/empty_reviews_view"
         android:text="@string/no_reviews_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-    <ListView
+        android:visibility="invisible" />
+
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/reviews_list_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />

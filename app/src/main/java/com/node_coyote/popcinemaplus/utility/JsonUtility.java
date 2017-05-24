@@ -103,7 +103,7 @@ public final class JsonUtility {
 
     }
 
-    public static ContentValues[] getReviewItemsFromJson(Context context , String trailerJsonString) throws JSONException {
+    public static ContentValues[] getReviewItemsFromJson(Context context , String reviewJsonString) throws JSONException {
 
         final String REVIEW_RESULTS = "results";
 
@@ -111,7 +111,7 @@ public final class JsonUtility {
         final String AUTHOR = "author";
         final String CONTENT= "content";
 
-        JSONObject root = new JSONObject(trailerJsonString);
+        JSONObject root = new JSONObject(reviewJsonString);
         JSONArray results = root.getJSONArray(REVIEW_RESULTS);
 
         ContentValues[] parsedReviewValues = new ContentValues[results.length()];
@@ -126,6 +126,10 @@ public final class JsonUtility {
                 String content = review.getString(CONTENT);
 
                 ContentValues values = new ContentValues();
+                values.put(MovieEntry.COLUMN_AUTHOR, author);
+                values.put(MovieEntry.COLUMN_CONTENT, content);
+
+                parsedReviewValues[i] = values;
 
             }
         } catch (JSONException e) {
@@ -135,6 +139,16 @@ public final class JsonUtility {
         context.getContentResolver().bulkInsert(MovieEntry.CONTENT_URI, parsedReviewValues);
         return parsedReviewValues;
 
+    }
+
+    public static ContentValues getJsonReviews(Context context, String reviewString){
+
+        //final String RESULTS = "results";
+
+        ContentValues values = new ContentValues();
+        values.put(MovieEntry.COLUMN_REVIEW_SET, reviewString);
+        context.getContentResolver().insert(MovieEntry.CONTENT_URI, values);
+        return values;
     }
 
 }

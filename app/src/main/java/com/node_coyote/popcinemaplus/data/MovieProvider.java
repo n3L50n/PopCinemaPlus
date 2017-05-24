@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.node_coyote.popcinemaplus.data.MovieContract.MovieEntry;
 
@@ -67,7 +68,7 @@ public class MovieProvider extends ContentProvider {
                 // query a row by id.
                 // Add an additional parameter for an individual item in the database.
                 selection = MovieEntry._ID + "=?";
-                selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri))};
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
                 cursor = database.query(MovieEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
                 break;
             default:
@@ -96,7 +97,27 @@ public class MovieProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
-        throw new RuntimeException("Use bulkInsert for PopCinema.");
+        // Get a writable database to fill with movie data goodies.
+        final SQLiteDatabase database = mHelper.getWritableDatabase();
+
+        switch (sMatcher.match(uri)) {
+            case MOVIE:
+                // bulkInsert
+            case MOVIE_ID:
+
+                // insert new pet with given values
+                long id = database.insert(MovieEntry.TABLE_NAME, null, values);
+
+                // Insertion fails if id is -1. Log it with error and return null
+                if (id == -1) {
+                    Log.v(LOG_TAG, "Failed to insert row for " + uri);
+                    return null;
+                }
+                getContext().getContentResolver().notifyChange(uri, null);
+                return ContentUris.withAppendedId(uri, id);
+            default:
+                return null;
+        }
     }
 
     @Override
@@ -148,7 +169,7 @@ public class MovieProvider extends ContentProvider {
                 break;
             case MOVIE_ID:
                 selection = MovieEntry._ID + "=?";
-                selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri))};
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
                 deletedRows = database.delete(MovieEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             default:
@@ -172,7 +193,7 @@ public class MovieProvider extends ContentProvider {
             case MOVIE_ID:
                 // Let's get the id from the uri so we know which row to update.
                 selection = MovieEntry._ID + "=?";
-                selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri))};
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
                 return updateItem(uri, values, selection, selectionArgs);
             default:
                 throw new IllegalArgumentException("Update is not supported for " + uri);
@@ -181,13 +202,14 @@ public class MovieProvider extends ContentProvider {
 
     /**
      * Let's use this method mainly to update Favorites values from 0 to 1 and vice versa.
+     *
      * @param uri
      * @param values
      * @param selection
      * @param selectionArgs
      * @return
      */
-    public int updateItem(Uri uri, ContentValues values, String selection, String[] selectionArgs){
+    public int updateItem(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
 
         //TODO Update Favorites.
 
