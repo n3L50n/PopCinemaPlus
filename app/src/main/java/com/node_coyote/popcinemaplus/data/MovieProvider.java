@@ -105,7 +105,7 @@ public class MovieProvider extends ContentProvider {
                 // bulkInsert
             case MOVIE_ID:
 
-                // insert new pet with given values
+                // insert new  with given values
                 long id = database.insert(MovieEntry.TABLE_NAME, null, values);
 
                 // Insertion fails if id is -1. Log it with error and return null

@@ -2,29 +2,33 @@ package com.node_coyote.popcinemaplus;
 
 import android.app.LoaderManager;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.node_coyote.popcinemaplus.data.MovieContract.MovieEntry;
+import com.node_coyote.popcinemaplus.data.MovieDatabaseHelper;
 import com.node_coyote.popcinemaplus.utility.JsonUtility;
 import com.node_coyote.popcinemaplus.utility.NetworkUtility;
 import com.squareup.picasso.Picasso;
 
 import java.net.URL;
-import java.util.ArrayList;
 
 public class MovieDetail extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -41,6 +45,9 @@ public class MovieDetail extends AppCompatActivity implements LoaderManager.Load
     private TextView mMovieRatedTextView;
     private ImageView mMoviePosterView;
     private RecyclerView mReviewRecycler;
+    private int mMovieId;
+
+    private static final int MOVIE_DETAIL_LOADER = 2;
 
     private static final String[] MOVIE_PROJECTION = {
             MovieEntry._ID,
@@ -54,9 +61,9 @@ public class MovieDetail extends AppCompatActivity implements LoaderManager.Load
             MovieEntry.COLUMN_TRAILER_SET,
             MovieEntry.COLUMN_TRAILER,
             MovieEntry.COLUMN_FAVORITE,
-            MovieEntry.COLUMN_REVIEW_SET
-//            MovieEntry.COLUMN_AUTHOR,
-//            MovieEntry.COLUMN_CONTENT
+            MovieEntry.COLUMN_REVIEW_SET,
+            MovieEntry.COLUMN_AUTHOR,
+            MovieEntry.COLUMN_CONTENT
     };
 
     @Override
@@ -77,7 +84,6 @@ public class MovieDetail extends AppCompatActivity implements LoaderManager.Load
         // Get the intent from the grid item that was tapped
         Intent intent = getIntent();
         mCurrentMovieUri = intent.getData();
-        getLoaderManager().initLoader(1, null, this);
 
         ImageButton playTrailerButton = (ImageButton) findViewById(R.id.watch_icon_button);
         playTrailerButton.setOnClickListener(new View.OnClickListener() {
@@ -88,18 +94,57 @@ public class MovieDetail extends AppCompatActivity implements LoaderManager.Load
                 startActivity(trailerIntent);
             }
         });
+        LinearLayoutManager layoutManager = new LinearLayoutManager(MovieDetail.this);
+        mReviewRecycler.setLayoutManager(layoutManager);
         mAdapter = new ReviewAdapter();
         mReviewRecycler.setAdapter(mAdapter);
+        if (checkforDatabase()) {
+            loadMovieData();
+        } else {
+            getLoaderManager().restartLoader(MOVIE_DETAIL_LOADER, null, this);
+
+        }
+    }
+
+    /**
+     * A method to load movie data in the background
+     */
+    private void loadMovieData() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            //new MovieDetail.FetchTrailerData().execute();
+            getLoaderManager().initLoader(MOVIE_DETAIL_LOADER, null, this);
+        }
+    }
+
+    private boolean checkforDatabase() {
+        boolean empty = true;
+        MovieDatabaseHelper helper = new MovieDatabaseHelper(this);
+        SQLiteDatabase database = helper.getReadableDatabase();
+        String check = "SELECT COUNT(*) FROM movies";
+        Cursor cursor = database.rawQuery(check, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            empty = (cursor.getInt(0) == 0);
+        }
+        cursor.close();
+        return empty;
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(this,
-                mCurrentMovieUri,
-                MOVIE_PROJECTION,
-                null,
-                null,
-                null);
+
+        switch (id) {
+            case MOVIE_DETAIL_LOADER:
+            return new CursorLoader(this,
+                    mCurrentMovieUri,
+                    MOVIE_PROJECTION,
+                    null,
+                    null,
+                    null);
+            default:
+                throw new RuntimeException("Loader not implemented" + id);
+        }
     }
 
     @Override
@@ -119,13 +164,14 @@ public class MovieDetail extends AppCompatActivity implements LoaderManager.Load
             int voteAverageColumnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_VOTE_AVERAGE);
             int trailerSetColumnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_TRAILER_SET);
             int favoriteColumnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_FAVORITE);
+            int reviewSetColumnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_REVIEW_SET);
 
             String posterPath = cursor.getString(posterPathColumnIndex);
             String summary = cursor.getString(summaryColumnIndex);
             String title = cursor.getString(titleColumnIndex);
             String releaseDate = cursor.getString(releaseDateColumnIndex);
             String rating = cursor.getString(voteAverageColumnIndex);
-            int movieId = cursor.getInt(movieIdColumnIndex);
+            mMovieId = cursor.getInt(movieIdColumnIndex);
 
             String released = getString(R.string.released_on_text) + " " + releaseDate;
             String rated = getString(R.string.rated_text) + " " + String.valueOf(rating);
@@ -138,13 +184,9 @@ public class MovieDetail extends AppCompatActivity implements LoaderManager.Load
             String baseImageUrl = "http://image.tmdb.org/t/p/w342/";
 
             Picasso.with(mMoviePosterView.getContext()).load(baseImageUrl + posterPath).into(mMoviePosterView);
-
-            mTrailerUrlSet = NetworkUtility.buildVideoDatasetUrl(String.valueOf(movieId));
-            mReviewUrlSet = NetworkUtility.buildReviewDatasetUrl(String.valueOf(movieId));
-
-            new FetchTrailerData().execute(mTrailerUrlSet);
-            new FetchReviewData().execute(mReviewUrlSet);
-
+        }
+        if (mMovieId != 0) {
+            new FetchReviewData().execute();
         }
     }
 
@@ -178,10 +220,13 @@ public class MovieDetail extends AppCompatActivity implements LoaderManager.Load
         @Override
         protected ContentValues[] doInBackground(URL... params) {
 
+            mReviewUrlSet = NetworkUtility.buildReviewDatasetUrl(String.valueOf(mMovieId));
+            Log.v("MOVIEID", String.valueOf(mMovieId));
             try {
                 String responseFromHttp = NetworkUtility.getResponseFromHttp(mReviewUrlSet);
                 mReviewResults = JsonUtility.getJsonReviews(MovieDetail.this, responseFromHttp);
 
+                Log.v("REVIEW RESULTS", mReviewResults.toString());
                 return JsonUtility.getReviewItemsFromJson(MovieDetail.this, mReviewResults.toString());
 
             } catch (Exception e) {
