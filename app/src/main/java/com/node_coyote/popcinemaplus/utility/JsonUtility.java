@@ -5,10 +5,14 @@ import android.content.Context;
 import android.util.Log;
 
 import com.node_coyote.popcinemaplus.data.MovieContract.MovieEntry;
+import com.node_coyote.popcinemaplus.data.Review;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by node_coyote on 5/2/17.
@@ -93,6 +97,7 @@ public final class JsonUtility {
                 ContentValues values = new ContentValues();
                 values.put(MovieEntry.COLUMN_TRAILER, newTrailer);
                 parsedTrailerValues[i] = values;
+                Log.v("parsedTraileVlues", newTrailer);
             }
         } catch (JSONException e) {
             Log.e("TrailerJSONUtility", "Problem parsing trailer json.");
@@ -103,16 +108,18 @@ public final class JsonUtility {
 
     }
 
-    public static ContentValues[] getReviewItemsFromJson(Context context , String reviewJsonString) throws JSONException {
+    public static ArrayList<Review> getReviewItemsFromJson(String reviewJsonString) throws JSONException {
 
         final String REVIEW_RESULTS = "results";
         final String AUTHOR = "author";
         final String CONTENT= "content";
 
-        JSONObject root = new JSONObject(reviewJsonString.substring(11));
+        JSONObject root = new JSONObject(reviewJsonString);
         JSONArray results = root.getJSONArray(REVIEW_RESULTS);
 
-        ContentValues[] parsedReviewValues = new ContentValues[results.length()];
+        //ContentValues[] parsedReviewValues = new ContentValues[results.length()];
+
+        ArrayList<Review> reviews = new ArrayList<>();
 
         try {
 
@@ -121,31 +128,32 @@ public final class JsonUtility {
                 JSONObject review = results.getJSONObject(i);
 
                 String author = review.getString(AUTHOR);
-                Log.v("Author", author);
                 String content = review.getString(CONTENT);
+                Log.v("JSOauthor", author);
 
-                ContentValues values = new ContentValues();
-                values.put(MovieEntry.COLUMN_AUTHOR, author);
-                values.put(MovieEntry.COLUMN_CONTENT, content);
-
-                parsedReviewValues[i] = values;
-
+//                ContentValues values = new ContentValues();
+//                values.put(MovieEntry.COLUMN_AUTHOR, author);
+//                values.put(MovieEntry.COLUMN_CONTENT, content);
+//
+//                parsedReviewValues[i] = values;
+                Review newReview = new Review(author, content);
+                reviews.add(newReview);
             }
         } catch (JSONException e) {
             Log.e("ReviewJSONUtility", "Problem parsing Reviews");
         }
 
-        context.getContentResolver().bulkInsert(MovieEntry.CONTENT_URI, parsedReviewValues);
-        return parsedReviewValues;
+        //context.getContentResolver().bulkInsert(MovieEntry.CONTENT_URI, parsedReviewValues);
+        return reviews;
 
     }
 
-    public static ContentValues getJsonReviews(Context context, String reviewString){
-
-        ContentValues values = new ContentValues();
-        values.put(MovieEntry.COLUMN_REVIEW_SET, reviewString);
-        context.getContentResolver().insert(MovieEntry.CONTENT_URI, values);
-        return values;
-    }
+//    public static ContentValues getJsonReviews(Context context, String reviewString){
+//
+//        ContentValues values = new ContentValues();
+//        values.put(MovieEntry.COLUMN_REVIEW_SET, reviewString);
+//        context.getContentResolver().insert(MovieEntry.CONTENT_URI, values);
+//        return values;
+//    }
 
 }

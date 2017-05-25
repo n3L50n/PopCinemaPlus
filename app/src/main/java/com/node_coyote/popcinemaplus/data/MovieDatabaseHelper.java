@@ -42,10 +42,10 @@ public class MovieDatabaseHelper extends SQLiteOpenHelper {
                     + MovieEntry.COLUMN_VOTE_AVERAGE + " REAL, "
                     + MovieEntry.COLUMN_TRAILER_SET + " TEXT, "
                     + MovieEntry.COLUMN_TRAILER + " TEXT, "
-                    + MovieEntry.COLUMN_FAVORITE + " INTEGER NOT NULL DEFAULT 0, "
-                    + MovieEntry.COLUMN_REVIEW_SET + " TEXT, "
-                    + MovieEntry.COLUMN_AUTHOR + " TEXT, "
-                    + MovieEntry.COLUMN_CONTENT + " TEXT);";
+                    + MovieEntry.COLUMN_FAVORITE + " INTEGER NOT NULL DEFAULT 0);";
+//                    + MovieEntry.COLUMN_REVIEW_SET + " TEXT, "
+//                    + MovieEntry.COLUMN_AUTHOR + " TEXT, "
+//                    + MovieEntry.COLUMN_CONTENT + " TEXT);";
 
 
     /**

@@ -1,6 +1,7 @@
 package com.node_coyote.popcinemaplus;
 
 import android.app.LoaderManager;
+import android.content.AsyncTaskLoader;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
@@ -20,20 +21,25 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.node_coyote.popcinemaplus.data.MovieContract.MovieEntry;
 import com.node_coyote.popcinemaplus.data.MovieDatabaseHelper;
+import com.node_coyote.popcinemaplus.data.Review;
 import com.node_coyote.popcinemaplus.utility.JsonUtility;
 import com.node_coyote.popcinemaplus.utility.NetworkUtility;
 import com.squareup.picasso.Picasso;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
-public class MovieDetail extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class MovieDetail extends AppCompatActivity
+        implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public ContentValues[] mTrailerResults;
-    public ContentValues mReviewResults;
+    public ArrayList<Review> mReviews;
     public URL mTrailerUrlSet;
     public URL mReviewUrlSet;
     public ReviewAdapter mAdapter;
@@ -44,7 +50,6 @@ public class MovieDetail extends AppCompatActivity implements LoaderManager.Load
     private TextView mMovieReleaseTextView;
     private TextView mMovieRatedTextView;
     private ImageView mMoviePosterView;
-    private RecyclerView mReviewRecycler;
     private int mMovieId;
 
     private static final int MOVIE_DETAIL_LOADER = 2;
@@ -60,10 +65,10 @@ public class MovieDetail extends AppCompatActivity implements LoaderManager.Load
             MovieEntry.COLUMN_VOTE_AVERAGE,
             MovieEntry.COLUMN_TRAILER_SET,
             MovieEntry.COLUMN_TRAILER,
-            MovieEntry.COLUMN_FAVORITE,
-            MovieEntry.COLUMN_REVIEW_SET,
-            MovieEntry.COLUMN_AUTHOR,
-            MovieEntry.COLUMN_CONTENT
+            MovieEntry.COLUMN_FAVORITE
+//            MovieEntry.COLUMN_REVIEW_SET,
+//            MovieEntry.COLUMN_AUTHOR,
+//            MovieEntry.COLUMN_CONTENT
     };
 
     @Override
@@ -78,8 +83,10 @@ public class MovieDetail extends AppCompatActivity implements LoaderManager.Load
         mMovieRatedTextView = (TextView) findViewById(R.id.movie_detail_vote_average);
         mMoviePosterView = (ImageView) findViewById(R.id.movie_detail_poster_image_view);
         noReviews = (TextView) findViewById(R.id.empty_reviews_view);
-        mReviewRecycler = (RecyclerView) findViewById(R.id.reviews_list_view);
-
+        ListView reviewList = (ListView) findViewById(R.id.reviews_list_view);
+        mReviews = new ArrayList<>();
+        mAdapter = new ReviewAdapter(this, mReviews);
+        reviewList.setAdapter(mAdapter);
 
         // Get the intent from the grid item that was tapped
         Intent intent = getIntent();
@@ -94,10 +101,7 @@ public class MovieDetail extends AppCompatActivity implements LoaderManager.Load
                 startActivity(trailerIntent);
             }
         });
-        LinearLayoutManager layoutManager = new LinearLayoutManager(MovieDetail.this);
-        mReviewRecycler.setLayoutManager(layoutManager);
-        mAdapter = new ReviewAdapter();
-        mReviewRecycler.setAdapter(mAdapter);
+
         if (checkforDatabase()) {
             loadMovieData();
         } else {
@@ -164,7 +168,7 @@ public class MovieDetail extends AppCompatActivity implements LoaderManager.Load
             int voteAverageColumnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_VOTE_AVERAGE);
             int trailerSetColumnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_TRAILER_SET);
             int favoriteColumnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_FAVORITE);
-            int reviewSetColumnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_REVIEW_SET);
+            //int reviewSetColumnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_REVIEW_SET);
 
             String posterPath = cursor.getString(posterPathColumnIndex);
             String summary = cursor.getString(summaryColumnIndex);
@@ -185,14 +189,18 @@ public class MovieDetail extends AppCompatActivity implements LoaderManager.Load
 
             Picasso.with(mMoviePosterView.getContext()).load(baseImageUrl + posterPath).into(mMoviePosterView);
         }
-        if (mMovieId != 0) {
-            new FetchReviewData().execute();
+        mReviewUrlSet = NetworkUtility.buildReviewDatasetUrl(String.valueOf(mMovieId));
+        Log.v("MOVIEID", String.valueOf(mMovieId));
+        new ReviewLoader(MovieDetail.this, mReviewUrlSet).loadInBackground();
+        //new FetchReviewData().execute();
+        if (mReviews != null && !mReviews.isEmpty()) {
+            mAdapter.addAll(mReviews);
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
+        mAdapter.clear();
     }
 
     // TODO place in it's own java file
@@ -215,24 +223,58 @@ public class MovieDetail extends AppCompatActivity implements LoaderManager.Load
         }
     }
 
-    public class FetchReviewData extends AsyncTask<URL, Void, ContentValues[]> {
+    public class FetchReviewData extends AsyncTask<URL, Void, List<Review>> {
 
         @Override
-        protected ContentValues[] doInBackground(URL... params) {
+        protected List<Review> doInBackground(URL... params) {
 
             mReviewUrlSet = NetworkUtility.buildReviewDatasetUrl(String.valueOf(mMovieId));
             Log.v("MOVIEID", String.valueOf(mMovieId));
             try {
                 String responseFromHttp = NetworkUtility.getResponseFromHttp(mReviewUrlSet);
-                mReviewResults = JsonUtility.getJsonReviews(MovieDetail.this, responseFromHttp);
-
-                Log.v("REVIEW RESULTS", mReviewResults.toString());
-                return JsonUtility.getReviewItemsFromJson(MovieDetail.this, mReviewResults.toString());
+//                mReviewResults = JsonUtility.getJsonReviews(MovieDetail.this, responseFromHttp);
+                mReviews = JsonUtility.getReviewItemsFromJson(responseFromHttp);
+                //Log.v("REVIEW RESULTS", mReviewResults.toString());
+                Log.v("REVIEW RESULTS", mReviews.toString());
+                return mReviews;
 
             } catch (Exception e) {
                 e.printStackTrace();
                 return null;
             }
+        }
+    }
+
+
+    public class ReviewLoader extends AsyncTaskLoader<List<Review>> {
+
+
+        public ReviewLoader(Context context, URL url) {
+            super(context);
+            mReviewUrlSet = url;
+        }
+
+        @Override
+        public List<Review> loadInBackground() {
+
+            try {
+                Log.v("LOADINBackReviewurl", mReviewUrlSet.toString());
+                String responseFromHttp = NetworkUtility.getResponseFromHttp(mReviewUrlSet);
+//                mReviewResults = JsonUtility.getJsonReviews(MovieDetail.this, responseFromHttp);
+                mReviews = JsonUtility.getReviewItemsFromJson(responseFromHttp);
+                //Log.v("REVIEW RESULTS", mReviewResults.toString());
+                Log.v("REVIEW RESULTS", mReviews.toString());
+                return mReviews;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onStartLoading(){
+            forceLoad();
         }
     }
 }

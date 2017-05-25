@@ -107,24 +107,24 @@ public class MovieContract {
          *  1 = true
          */
         public static final String COLUMN_FAVORITE = "favorite";
-
-        /**
-         * Type: TEXT
-         * The path to a set of reviews.
-         */
-        public static final String COLUMN_REVIEW_SET = "review_set";
-
-        /**
-         * Type: TEXT
-         * The author of an individual review within the set of reviews.
-         */
-        public static final String COLUMN_AUTHOR = "author";
-
-        /**
-         * Type: TEXT
-         * The content of an individual review within the set of reviews.
-         */
-        public static final String COLUMN_CONTENT = "content";
+//
+//        /**
+//         * Type: TEXT
+//         * The path to a set of reviews.
+//         */
+//        public static final String COLUMN_REVIEW_SET = "review_set";
+//
+//        /**
+//         * Type: TEXT
+//         * The author of an individual review within the set of reviews.
+//         */
+//        public static final String COLUMN_AUTHOR = "author";
+//
+//        /**
+//         * Type: TEXT
+//         * The content of an individual review within the set of reviews.
+//         */
+//        public static final String COLUMN_CONTENT = "content";
 
     }
 }
