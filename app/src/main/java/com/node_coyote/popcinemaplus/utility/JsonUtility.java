@@ -73,7 +73,7 @@ public final class JsonUtility {
         return parsedMovieValues;
     }
 
-    public static ContentValues[] getTrailerItemsFromJson(Context context, String trailerJsonString) throws JSONException {
+    public static ArrayList<String> getTrailerItemsFromJson(Context context, String trailerJsonString) throws JSONException {
 
         final String TRAILER_RESULTS = "results";
 
@@ -83,7 +83,8 @@ public final class JsonUtility {
         JSONObject root = new JSONObject(trailerJsonString);
         JSONArray results = root.getJSONArray(TRAILER_RESULTS);
 
-        ContentValues[] parsedTrailerValues = new ContentValues[results.length()];
+        ArrayList<String> parsedTrailers = new ArrayList<>();
+        //ContentValues[] parsedTrailerValues = new ContentValues[results.length()];
 
         try {
 
@@ -94,17 +95,19 @@ public final class JsonUtility {
                 String key = trailer.getString(TRAILER_KEY);
                 String newTrailer = YOUTUBE_BASE_URL + key;
 
-                ContentValues values = new ContentValues();
-                values.put(MovieEntry.COLUMN_TRAILER, newTrailer);
-                parsedTrailerValues[i] = values;
+                parsedTrailers.add(newTrailer);
+                //ContentValues values = new ContentValues();
+                //values.put(MovieEntry.COLUMN_TRAILER, newTrailer);
+                //parsedTrailerValues[i] = values;
                 Log.v("parsedTraileVlues", newTrailer);
+
             }
         } catch (JSONException e) {
             Log.e("TrailerJSONUtility", "Problem parsing trailer json.");
         }
 
-        context.getContentResolver().bulkInsert(MovieEntry.CONTENT_URI, parsedTrailerValues);
-        return parsedTrailerValues;
+        //context.getContentResolver().bulkInsert(MovieEntry.CONTENT_URI, parsedTrailerValues);
+        return parsedTrailers;
 
     }
 

@@ -38,7 +38,7 @@ import java.util.List;
 public class MovieDetail extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    public ContentValues[] mTrailerResults;
+    public ArrayList<String> mTrailerResults;
     public ArrayList<Review> mReviews;
     public URL mTrailerUrlSet;
     public URL mReviewUrlSet;
@@ -65,8 +65,8 @@ public class MovieDetail extends AppCompatActivity
             MovieEntry.COLUMN_VOTE_AVERAGE,
             MovieEntry.COLUMN_TRAILER_SET,
             MovieEntry.COLUMN_TRAILER,
-            MovieEntry.COLUMN_FAVORITE
-//            MovieEntry.COLUMN_REVIEW_SET,
+            MovieEntry.COLUMN_FAVORITE,
+            MovieEntry.COLUMN_REVIEW_SET
 //            MovieEntry.COLUMN_AUTHOR,
 //            MovieEntry.COLUMN_CONTENT
     };
@@ -96,7 +96,9 @@ public class MovieDetail extends AppCompatActivity
         playTrailerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Uri y = Uri.parse(MovieEntry.COLUMN_TRAILER);
+
+                Log.v("TRAILERBUTTON", mTrailerResults.get(0));
+                Uri y = Uri.parse(mTrailerResults.get(0));
                 Intent trailerIntent = new Intent(Intent.ACTION_VIEW, y);
                 startActivity(trailerIntent);
             }
@@ -117,7 +119,7 @@ public class MovieDetail extends AppCompatActivity
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
-            //new MovieDetail.FetchTrailerData().execute();
+
             getLoaderManager().initLoader(MOVIE_DETAIL_LOADER, null, this);
         }
     }
@@ -176,6 +178,9 @@ public class MovieDetail extends AppCompatActivity
             String releaseDate = cursor.getString(releaseDateColumnIndex);
             String rating = cursor.getString(voteAverageColumnIndex);
             mMovieId = cursor.getInt(movieIdColumnIndex);
+            String trailerSet = cursor.getString(trailerSetColumnIndex);
+
+
 
             String released = getString(R.string.released_on_text) + " " + releaseDate;
             String rated = getString(R.string.rated_text) + " " + String.valueOf(rating);
@@ -189,13 +194,25 @@ public class MovieDetail extends AppCompatActivity
 
             Picasso.with(mMoviePosterView.getContext()).load(baseImageUrl + posterPath).into(mMoviePosterView);
         }
+
+        // TODO save off COLUMN_TRAILER_SET
+        mTrailerUrlSet = NetworkUtility.buildVideoDatasetUrl(String.valueOf(mMovieId));
+        ContentValues values = new ContentValues();
+        values.put(MovieEntry.COLUMN_TRAILER_SET, mTrailerUrlSet.toString());
+
+        // TODO save off at COLUMN_REVIEW_SET
         mReviewUrlSet = NetworkUtility.buildReviewDatasetUrl(String.valueOf(mMovieId));
+        values.put(MovieEntry.COLUMN_REVIEW_SET, mReviewUrlSet.toString());
+        getContentResolver().insert(MovieEntry.CONTENT_URI, values);
+
         Log.v("MOVIEID", String.valueOf(mMovieId));
-        new ReviewLoader(MovieDetail.this, mReviewUrlSet).loadInBackground();
-        //new FetchReviewData().execute();
+        new ReviewLoader(MovieDetail.this, mReviewUrlSet);
+        new FetchReviewData().execute();
         if (mReviews != null && !mReviews.isEmpty()) {
             mAdapter.addAll(mReviews);
         }
+        new MovieDetail.FetchTrailerData().execute();
+
     }
 
     @Override
@@ -203,13 +220,13 @@ public class MovieDetail extends AppCompatActivity
         mAdapter.clear();
     }
 
-    // TODO place in it's own java file
-    public class FetchTrailerData extends AsyncTask<URL, Void, ContentValues[]> {
+    public class FetchTrailerData extends AsyncTask<URL, Void, ArrayList<String>> {
 
         @Override
-        protected ContentValues[] doInBackground(URL... params) {
+        protected ArrayList<String> doInBackground(URL... params) {
 
             try {
+                Log.v("HELLSTRAIL", mTrailerUrlSet.toString());
 
                 String responseFromHttp = NetworkUtility.getResponseFromHttp(mTrailerUrlSet);
                 mTrailerResults = JsonUtility.getTrailerItemsFromJson(MovieDetail.this, responseFromHttp);
@@ -227,7 +244,7 @@ public class MovieDetail extends AppCompatActivity
 
         @Override
         protected List<Review> doInBackground(URL... params) {
-
+            new ReviewLoader(MovieDetail.this, mReviewUrlSet);
             mReviewUrlSet = NetworkUtility.buildReviewDatasetUrl(String.valueOf(mMovieId));
             Log.v("MOVIEID", String.valueOf(mMovieId));
             try {
@@ -260,10 +277,7 @@ public class MovieDetail extends AppCompatActivity
             try {
                 Log.v("LOADINBackReviewurl", mReviewUrlSet.toString());
                 String responseFromHttp = NetworkUtility.getResponseFromHttp(mReviewUrlSet);
-//                mReviewResults = JsonUtility.getJsonReviews(MovieDetail.this, responseFromHttp);
                 mReviews = JsonUtility.getReviewItemsFromJson(responseFromHttp);
-                //Log.v("REVIEW RESULTS", mReviewResults.toString());
-                Log.v("REVIEW RESULTS", mReviews.toString());
                 return mReviews;
 
             } catch (Exception e) {

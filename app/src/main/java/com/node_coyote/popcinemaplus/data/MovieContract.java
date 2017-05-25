@@ -107,12 +107,12 @@ public class MovieContract {
          *  1 = true
          */
         public static final String COLUMN_FAVORITE = "favorite";
-//
-//        /**
-//         * Type: TEXT
-//         * The path to a set of reviews.
-//         */
-//        public static final String COLUMN_REVIEW_SET = "review_set";
+
+        /**
+         * Type: TEXT
+         * The path to a set of reviews.
+         */
+        public static final String COLUMN_REVIEW_SET = "review_set";
 //
 //        /**
 //         * Type: TEXT

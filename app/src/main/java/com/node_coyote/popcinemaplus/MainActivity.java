@@ -72,7 +72,8 @@ public class MainActivity extends AppCompatActivity
             MovieEntry.COLUMN_VOTE_AVERAGE,
             MovieEntry.COLUMN_TRAILER_SET,
             MovieEntry.COLUMN_TRAILER,
-            MovieEntry.COLUMN_FAVORITE
+            MovieEntry.COLUMN_FAVORITE,
+            MovieEntry.COLUMN_REVIEW_SET
     };
 
     @Override
@@ -258,7 +259,6 @@ public class MainActivity extends AppCompatActivity
         }
         MovieDatabaseHelper helper = new MovieDatabaseHelper(getApplicationContext());
         mAdapter.swapCursor(helper.query(MOVIE_PROJECTION, sortOrder));
-
     }
 
     /**
