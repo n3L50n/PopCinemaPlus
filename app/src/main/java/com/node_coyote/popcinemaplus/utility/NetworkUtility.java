@@ -25,7 +25,7 @@ public class NetworkUtility {
     private static final String API_KEY = "api_key=";
 
     // The "value" part of the appended query parameter for the api key
-    private static final String API_KEY_VALUE = "0d4d26dde08feee69c914af1a77fe3c4";
+    private static final String API_KEY_VALUE = "Replace with API key";
 
     // Use top rated to call the top rated sort
     private static final String TOP_RATED = "top_rated";
