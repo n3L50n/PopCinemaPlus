@@ -2,7 +2,18 @@
 <resources>
     <dimen name="small_margin_padding">8dp</dimen>
     <dimen name="general_margin_padding">16dp</dimen>
+
+    <!--Detail Dimens-->
     <dimen name="detail_title_text_size">32sp</dimen>
+    <dimen name="detail_poster_width_portrait">0dp</dimen>
+    <dimen name="detail_poster_height_portrait">200dp</dimen>
+    <dimen name="detail_poster_margin_left">0dp</dimen>
+    <dimen name="detail_divider_height">1dp</dimen>
+    <dimen name="detail_layout_width">0dp</dimen>
+    <dimen name="detail_cta_width">48dp</dimen>
+    <dimen name="detail_cta_height">48dp</dimen>
+
+    <!--Empty View Dimens-->
     <dimen name="empty_text_size">24sp</dimen>
     <dimen name="empty_subtext_size">18sp</dimen>
 </resources>

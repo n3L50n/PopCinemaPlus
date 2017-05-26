@@ -12,9 +12,9 @@
         android:orientation="horizontal">
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="@dimen/detail_layout_width"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
+            android:layout_weight="@integer/detail_text_layout_weight_portrait"
             android:orientation="vertical">
 
             <TextView
@@ -37,22 +37,14 @@
 
         <ImageView
             android:id="@+id/movie_detail_poster_image_view"
-            android:layout_width="0dp"
-            android:layout_height="200dp"
-            android:layout_gravity="center|top"
-            android:layout_marginEnd="@dimen/small_margin_padding"
-            android:layout_marginLeft="0dp"
-            android:layout_marginRight="@dimen/small_margin_padding"
-            android:layout_marginStart="0dp"
-            android:layout_marginTop="@dimen/general_margin_padding"
-            android:layout_weight="1"
-            android:background="@color/movie_background"
+            style="@style/DetailMoviePosterStylePortrait"
             android:contentDescription="@string/grid_movie_poster_content_description" />
+
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="@dimen/detail_divider_height"
         android:background="@color/colorAccentSecondary" />
 
     <LinearLayout
@@ -70,8 +62,8 @@
 
         <ImageButton
             android:id="@+id/watch_icon_button"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="@dimen/detail_cta_width"
+            android:layout_height="@dimen/detail_cta_height"
             android:background="@color/transparent"
             android:contentDescription="@string/watch_trailer_button_content_description"
             android:src="@drawable/ic_play_circle_outline_black_24px" />
@@ -87,8 +79,8 @@
 
         <ImageButton
             android:id="@+id/favorite_icon_button"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="@dimen/detail_cta_width"
+            android:layout_height="@dimen/detail_cta_height"
             android:background="@color/transparent"
             android:contentDescription="@string/favorite_movie_button_content_description"
             android:src="@drawable/ic_favorite_border" />
@@ -97,7 +89,7 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="@dimen/detail_divider_height"
         android:background="@color/colorAccentSecondary" />
 
     <TextView
@@ -111,7 +103,7 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="@dimen/detail_divider_height"
         android:background="@color/colorAccentSecondary" />
 
     <TextView

@@ -45,6 +45,17 @@
         <item name="android:textColor">@color/colorPrimary</item>
     </style>
 
+    <style name="DetailMoviePosterStylePortrait">
+        <item name="android:layout_width">@dimen/detail_poster_width_portrait</item>
+        <item name="android:layout_height">@dimen/detail_poster_height_portrait</item>
+        <item name="android:layout_gravity">center|top</item>
+        <item name="android:layout_weight">@integer/detail_poster_weight</item>
+        <item name="android:background">@color/movie_background</item>
+        <item name="android:layout_marginTop">@dimen/general_margin_padding</item>
+        <item name="android:layout_marginLeft">@dimen/detail_poster_margin_left</item>
+        <item name="android:layout_marginRight">@dimen/small_margin_padding</item>
+    </style>
+
     <style name="EmptyViewTextStyle">
         <item name="android:layout_below">@+id/empty_movie_image</item>
         <item name="android:text">@string/empty_text_message</item>

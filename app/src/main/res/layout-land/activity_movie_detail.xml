@@ -73,8 +73,8 @@
 
             <ImageButton
                 android:id="@+id/watch_icon_button"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="@dimen/detail_cta_width"
+                android:layout_height="@dimen/detail_cta_height"
                 android:background="@color/transparent"
                 android:layout_gravity="center_vertical"
                 android:contentDescription="@string/watch_trailer_button_content_description"
@@ -89,8 +89,8 @@
 
             <ImageButton
                 android:id="@+id/favorite_icon_button"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="@dimen/detail_cta_width"
+                android:layout_height="@dimen/detail_cta_height"
                 android:background="@color/transparent"
                 android:layout_gravity="center_vertical"
                 android:contentDescription="@string/favorite_movie_button_content_description"
