@@ -15,8 +15,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
@@ -126,11 +124,10 @@ public class MovieDetail extends AppCompatActivity
             }
         });
 
-        if (checkforDatabase()) {
+        if (checkForDatabase()) {
             loadMovieData();
         } else {
             getLoaderManager().restartLoader(MOVIE_DETAIL_LOADER, null, this);
-
         }
     }
 
@@ -138,14 +135,13 @@ public class MovieDetail extends AppCompatActivity
         ContentValues contentValues = new ContentValues();
 
         switch (parameter) {
-
             case 0:
-                // UPDATE to 0 False
+                // Update to 0 False.
                 contentValues.put(MovieEntry.COLUMN_FAVORITE, 0);
                 getContentResolver().update(mCurrentMovieUri, contentValues, null, null);
                 break;
             case 1:
-                // UPdate to 1 True
+                // Update to 1 True.
                 contentValues.put(MovieEntry.COLUMN_FAVORITE, 1);
                 getContentResolver().update(mCurrentMovieUri, contentValues, null, null);
                 break;
@@ -153,7 +149,6 @@ public class MovieDetail extends AppCompatActivity
                     throw new RuntimeException("Invalid favorites parameter");
 
         }
-
     }
 
     /**
@@ -163,12 +158,11 @@ public class MovieDetail extends AppCompatActivity
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
-            // TODO ideally load
             getLoaderManager().initLoader(MOVIE_DETAIL_LOADER, null, this);
         }
     }
 
-    private boolean checkforDatabase() {
+    private boolean checkForDatabase() {
         boolean empty = true;
         MovieDatabaseHelper helper = new MovieDatabaseHelper(this);
         SQLiteDatabase database = helper.getReadableDatabase();
@@ -179,6 +173,28 @@ public class MovieDetail extends AppCompatActivity
         }
         cursor.close();
         return empty;
+    }
+
+    private void favoriteCheck(int isFavorite, String[] projection){
+        switch (isFavorite) {
+            case 0:
+                Log.v("Fvr", String.valueOf(isFavorite));
+                getContentResolver().query(mCurrentMovieUri, projection, mCurrentMovieUri.toString().substring(51), null, null );
+                mFavoritesButton.setImageResource(R.drawable.ic_favorite_border);
+                break;
+            case 1:
+                Log.v("Fvr", String.valueOf(isFavorite));
+                getContentResolver().query(mCurrentMovieUri, projection, mCurrentMovieUri.toString().substring(51), null, null );
+                mFavoritesButton.setImageResource(R.drawable.ic_favorite_fill);
+
+                break;
+            default:
+                Log.v("Fvr", String.valueOf(isFavorite));
+                getContentResolver().query(mCurrentMovieUri, projection, mCurrentMovieUri.toString().substring(51), null, null );
+                mFavoritesButton.setImageResource(R.drawable.ic_favorite_border);
+                break;
+
+        }
     }
 
     @Override
@@ -219,50 +235,32 @@ public class MovieDetail extends AppCompatActivity
             String releaseDate = cursor.getString(releaseDateColumnIndex);
             String rating = cursor.getString(voteAverageColumnIndex);
             mMovieId = cursor.getInt(movieIdColumnIndex);
+
+            // Check if item is a favorite, update UI accordingly.
             int isFavorite = cursor.getInt(favoriteColumnIndex);
-            String[] projection = new String[]{"id, favorite", mCurrentMovieUri.toString().substring(51), "0", "1" };
-
-            switch (isFavorite) {
-                case 0:
-                    Log.v("Fvr", String.valueOf(isFavorite));
-                    getContentResolver().query(mCurrentMovieUri, projection, mCurrentMovieUri.toString().substring(51), null, null );
-                    mFavoritesButton.setImageResource(R.drawable.ic_favorite_border);
-                    break;
-                case 1:
-                    Log.v("Fvr", String.valueOf(isFavorite));
-                    getContentResolver().query(mCurrentMovieUri, projection, mCurrentMovieUri.toString().substring(51), null, null );
-                    mFavoritesButton.setImageResource(R.drawable.ic_favorite_fill);
-
-                    break;
-                default:
-                    Log.v("Fvr", String.valueOf(isFavorite));
-                    getContentResolver().query(mCurrentMovieUri, projection, mCurrentMovieUri.toString().substring(51), null, null );
-                    mFavoritesButton.setImageResource(R.drawable.ic_favorite_border);
-                    break;
-
-            }
+            String[] projection = new String[]{"id, favorite", mCurrentMovieUri.toString().substring(51)};
+            favoriteCheck(isFavorite, projection);
             String released = getString(R.string.released_on_text) + " " + releaseDate;
             String rated = getString(R.string.rated_text) + " " + String.valueOf(rating);
 
+            // Update views with text and poster image.
             mMovieSummaryTextView.setText(summary);
             mMovieTitleTextView.setText(title);
             mMovieReleaseTextView.setText(released);
             mMovieRatedTextView.setText(rated);
-
             String baseImageUrl = "http://image.tmdb.org/t/p/w342/";
-
             Picasso.with(mMoviePosterView.getContext()).load(baseImageUrl + posterPath).into(mMoviePosterView);
         }
 
         // TODO save off COLUMN_TRAILER_SET
-        mTrailerUrlSet = NetworkUtility.buildVideoDatasetUrl(String.valueOf(mMovieId));
-        ContentValues values = new ContentValues();
-        values.put(MovieEntry.COLUMN_TRAILER_SET, mTrailerUrlSet.toString());
+//        mTrailerUrlSet = NetworkUtility.buildVideoDatasetUrl(String.valueOf(mMovieId));
+//        ContentValues values = new ContentValues();
+//        values.put(MovieEntry.COLUMN_TRAILER_SET, mTrailerUrlSet.toString());
 
         // TODO save off at COLUMN_REVIEW_SET
-        mReviewUrlSet = NetworkUtility.buildReviewDatasetUrl(String.valueOf(mMovieId));
-        values.put(MovieEntry.COLUMN_REVIEW_SET, mReviewUrlSet.toString());
-        getContentResolver().insert(MovieEntry.CONTENT_URI, values);
+        //mReviewUrlSet = NetworkUtility.buildReviewDatasetUrl(String.valueOf(mMovieId));
+        //values.put(MovieEntry.COLUMN_REVIEW_SET, mReviewUrlSet.toString());
+        //getContentResolver().insert(MovieEntry.CONTENT_URI, values);
 
         new FetchReviewData().execute();
         new FetchTrailerData().execute();
@@ -279,6 +277,7 @@ public class MovieDetail extends AppCompatActivity
 
         @Override
         protected ArrayList<String> doInBackground(URL... params) {
+            mTrailerUrlSet = NetworkUtility.buildVideoDatasetUrl(String.valueOf(mMovieId));
 
             try {
                 Log.v("HELLSTRAIL", mTrailerUrlSet.toString());
@@ -320,7 +319,6 @@ public class MovieDetail extends AppCompatActivity
 
 
     public class ReviewLoader extends AsyncTaskLoader<List<Review>> {
-
 
         public ReviewLoader(Context context, URL url) {
             super(context);

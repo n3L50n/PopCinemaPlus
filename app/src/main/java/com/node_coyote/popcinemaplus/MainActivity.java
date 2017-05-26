@@ -242,19 +242,19 @@ public class MainActivity extends AppCompatActivity
         switch (parameter) {
             case SORT_POPULAR_MOVIES:
                 //query() popular
-
                 sortOrder = MovieEntry.COLUMN_POPULARITY + " DESC";
                 break;
             case SORT_TOP_RATED_MOVIES:
                 // query() top rated
-
                 sortOrder = MovieEntry.COLUMN_VOTE_AVERAGE + " DESC";
                 break;
             case SORT_FAVORITES:
                 // query() favorites
-                // TODO  if a movie has a 1 in the favorite column, show it.
-                // TODO maybe move to separate favoritesQuery method?
-                sortOrder = MovieEntry.COLUMN_FAVORITE;
+                String[] projection = new String[]{"id, favorite"};
+                sortOrder = MovieEntry.COLUMN_FAVORITE + " DESC";
+
+                getContentResolver().query(MovieEntry.CONTENT_URI, projection, " favorite=1", null, sortOrder );
+
                 break;
         }
         MovieDatabaseHelper helper = new MovieDatabaseHelper(getApplicationContext());
