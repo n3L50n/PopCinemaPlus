@@ -202,7 +202,6 @@ public class MovieProvider extends ContentProvider {
 
     /**
      * Let's use this method mainly to update Favorites values from 0 to 1 and vice versa.
-     *
      * @param uri
      * @param values
      * @param selection
@@ -211,7 +210,12 @@ public class MovieProvider extends ContentProvider {
      */
     public int updateItem(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
 
-        //TODO Update Favorites.
+        if (values.containsKey(MovieEntry.COLUMN_FAVORITE)) {
+            Integer favorite = values.getAsInteger(MovieEntry.COLUMN_FAVORITE);
+            if (favorite != null && favorite < 0){
+                throw new IllegalArgumentException("Movies must have a favorite value of 0 or 1");
+            }
+        }
 
         if (values.size() == 0) {
             return 0;
@@ -221,7 +225,7 @@ public class MovieProvider extends ContentProvider {
 
         int updatedRows = database.update(MovieEntry.TABLE_NAME, values, selection, selectionArgs);
 
-        if (updatedRows != 0) {
+        if (updatedRows != 0 ){
             getContext().getContentResolver().notifyChange(uri, null);
         }
 

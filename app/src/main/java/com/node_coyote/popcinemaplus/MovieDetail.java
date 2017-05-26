@@ -78,7 +78,11 @@ public class MovieDetail extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
 
-        mFavoritesClicked = false;
+        mFavoritesClicked = true;
+        // Get the intent from the grid item that was tapped
+        Intent intent = getIntent();
+        mCurrentMovieUri = intent.getData();
+        mFavoritesButton = (ImageButton) findViewById(R.id.favorite_icon_button);
 
         // Find movie Detail TextViews
         mMovieTitleTextView = (TextView) findViewById(R.id.movie_detail_title);
@@ -88,7 +92,6 @@ public class MovieDetail extends AppCompatActivity
         mMoviePosterView = (ImageView) findViewById(R.id.movie_detail_poster_image_view);
         noReviews = (TextView) findViewById(R.id.empty_reviews_view);
         ListView reviewList = (ListView) findViewById(R.id.reviews_list_view);
-        mFavoritesButton = (ImageButton) findViewById(R.id.favorite_icon_button);
         mFavoritesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -109,10 +112,7 @@ public class MovieDetail extends AppCompatActivity
         mAdapter = new ReviewAdapter(this, mReviews);
         reviewList.setAdapter(mAdapter);
 
-        // Get the intent from the grid item that was tapped
-        Intent intent = getIntent();
-        mCurrentMovieUri = intent.getData();
-        favoriteCheck();
+
 
         ImageButton playTrailerButton = (ImageButton) findViewById(R.id.watch_icon_button);
         playTrailerButton.setOnClickListener(new View.OnClickListener() {
@@ -134,33 +134,11 @@ public class MovieDetail extends AppCompatActivity
         }
     }
 
-    private void favoriteCheck(){
-
-        MovieDatabaseHelper helper = new MovieDatabaseHelper(this);
-        SQLiteDatabase database = helper.getReadableDatabase();
-        String check = "SELECT id, favorite FROM movies WHERE id = ?";
-        String[] args = new String[]{" " + mCurrentMovieUri.toString().substring(51)};
-        Log.v("FUCK", mCurrentMovieUri.toString().substring(51));
-        Cursor cursor = database.rawQuery(check, new String[]{mCurrentMovieUri.toString().substring(51)});
-
-        if (cursor != null && cursor.moveToFirst()) {
-            int index = cursor.getColumnIndex(MovieEntry.COLUMN_FAVORITE);
-            int isFavorite = cursor.getInt(index);
-            Log.v("Rinkl", String.valueOf(isFavorite));
-            switch (isFavorite) {
-                case 0:
-                    mFavoritesButton.setImageResource(R.drawable.ic_favorite_border);
-                case 1:
-                    mFavoritesButton.setImageResource(R.drawable.ic_favorite_fill);
-            }
-        }
-        cursor.close();
-    }
-
     private void favorite(int parameter) {
         ContentValues contentValues = new ContentValues();
 
         switch (parameter) {
+
             case 0:
                 // UPDATE to 0 False
                 contentValues.put(MovieEntry.COLUMN_FAVORITE, 0);
@@ -232,11 +210,8 @@ public class MovieDetail extends AppCompatActivity
             int releaseDateColumnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_RELEASE_DATE);
             int movieIdColumnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_MOVIE_ID);
             int titleColumnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_TITLE);
-            int popularityColumnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_POPULARITY);
             int voteAverageColumnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_VOTE_AVERAGE);
-            int trailerSetColumnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_TRAILER_SET);
             int favoriteColumnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_FAVORITE);
-            //int reviewSetColumnIndex = cursor.getColumnIndex(MovieEntry.COLUMN_REVIEW_SET);
 
             String posterPath = cursor.getString(posterPathColumnIndex);
             String summary = cursor.getString(summaryColumnIndex);
@@ -244,10 +219,28 @@ public class MovieDetail extends AppCompatActivity
             String releaseDate = cursor.getString(releaseDateColumnIndex);
             String rating = cursor.getString(voteAverageColumnIndex);
             mMovieId = cursor.getInt(movieIdColumnIndex);
-            String trailerSet = cursor.getString(trailerSetColumnIndex);
+            int isFavorite = cursor.getInt(favoriteColumnIndex);
+            String[] projection = new String[]{"id, favorite", mCurrentMovieUri.toString().substring(51), "0", "1" };
 
+            switch (isFavorite) {
+                case 0:
+                    Log.v("Fvr", String.valueOf(isFavorite));
+                    getContentResolver().query(mCurrentMovieUri, projection, mCurrentMovieUri.toString().substring(51), null, null );
+                    mFavoritesButton.setImageResource(R.drawable.ic_favorite_border);
+                    break;
+                case 1:
+                    Log.v("Fvr", String.valueOf(isFavorite));
+                    getContentResolver().query(mCurrentMovieUri, projection, mCurrentMovieUri.toString().substring(51), null, null );
+                    mFavoritesButton.setImageResource(R.drawable.ic_favorite_fill);
 
+                    break;
+                default:
+                    Log.v("Fvr", String.valueOf(isFavorite));
+                    getContentResolver().query(mCurrentMovieUri, projection, mCurrentMovieUri.toString().substring(51), null, null );
+                    mFavoritesButton.setImageResource(R.drawable.ic_favorite_border);
+                    break;
 
+            }
             String released = getString(R.string.released_on_text) + " " + releaseDate;
             String rated = getString(R.string.rated_text) + " " + String.valueOf(rating);
 
@@ -271,13 +264,8 @@ public class MovieDetail extends AppCompatActivity
         values.put(MovieEntry.COLUMN_REVIEW_SET, mReviewUrlSet.toString());
         getContentResolver().insert(MovieEntry.CONTENT_URI, values);
 
-        Log.v("MOVIEID", String.valueOf(mMovieId));
-        new ReviewLoader(MovieDetail.this, mReviewUrlSet);
         new FetchReviewData().execute();
-        if (mReviews != null && !mReviews.isEmpty()) {
-            mAdapter.addAll(mReviews);
-        }
-        new MovieDetail.FetchTrailerData().execute();
+        new FetchTrailerData().execute();
         cursor.close();
 
     }
@@ -313,13 +301,14 @@ public class MovieDetail extends AppCompatActivity
         protected List<Review> doInBackground(URL... params) {
             new ReviewLoader(MovieDetail.this, mReviewUrlSet);
             mReviewUrlSet = NetworkUtility.buildReviewDatasetUrl(String.valueOf(mMovieId));
-            Log.v("MOVIEID", String.valueOf(mMovieId));
+            Log.v("backgrMOVIEID", String.valueOf(mMovieId));
             try {
                 String responseFromHttp = NetworkUtility.getResponseFromHttp(mReviewUrlSet);
-//                mReviewResults = JsonUtility.getJsonReviews(MovieDetail.this, responseFromHttp);
                 mReviews = JsonUtility.getReviewItemsFromJson(responseFromHttp);
-                //Log.v("REVIEW RESULTS", mReviewResults.toString());
                 Log.v("REVIEW RESULTS", mReviews.toString());
+                if (mReviews != null && !mReviews.isEmpty()) {
+                    mAdapter.addAll(mReviews);
+                }
                 return mReviews;
 
             } catch (Exception e) {
@@ -345,6 +334,7 @@ public class MovieDetail extends AppCompatActivity
                 Log.v("LOADINBackReviewurl", mReviewUrlSet.toString());
                 String responseFromHttp = NetworkUtility.getResponseFromHttp(mReviewUrlSet);
                 mReviews = JsonUtility.getReviewItemsFromJson(responseFromHttp);
+
                 return mReviews;
 
             } catch (Exception e) {

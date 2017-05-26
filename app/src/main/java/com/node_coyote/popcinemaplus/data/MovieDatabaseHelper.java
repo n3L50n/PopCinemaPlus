@@ -55,9 +55,7 @@ public class MovieDatabaseHelper extends SQLiteOpenHelper {
      */
     @Override
     public void onCreate(SQLiteDatabase database) {
-
             database.execSQL(SQL_CREATE_MOVIE_TABLE);
-
     }
 
     /**
@@ -88,21 +86,4 @@ public class MovieDatabaseHelper extends SQLiteOpenHelper {
         }
         return cursor;
     }
-
-//    public Cursor getFavorite(String[] columns ) {
-//
-//        SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
-//        builder.setTables(MovieEntry.TABLE_NAME);
-//
-//        Cursor cursor = builder.query(getReadableDatabase(), columns,
-//                null, null, null, null, null);
-//
-//        if (cursor == null) {
-//            return null;
-//        } else if (!cursor.moveToFirst()){
-//            cursor.close();
-//            return null;
-//        }
-//        return cursor;
-//    }
 }
