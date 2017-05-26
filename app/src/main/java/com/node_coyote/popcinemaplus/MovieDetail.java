@@ -110,8 +110,6 @@ public class MovieDetail extends AppCompatActivity
         mAdapter = new ReviewAdapter(this, mReviews);
         reviewList.setAdapter(mAdapter);
 
-
-
         ImageButton playTrailerButton = (ImageButton) findViewById(R.id.watch_icon_button);
         playTrailerButton.setOnClickListener(new View.OnClickListener() {
             @Override

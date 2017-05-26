@@ -16,12 +16,12 @@
         android:orderInCategory="2"
         android:icon="@drawable/ic_star"
         android:title="@string/menu_title_top_rated"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 
     <item android:id="@+id/action_favorites"
         android:icon="@drawable/ic_favorite_fill_dark"
         android:orderInCategory="3"
         android:title="@string/menu_title_favorites"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
 
 </menu>
