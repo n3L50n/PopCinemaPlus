@@ -7,18 +7,21 @@
     <item
         android:id="@+id/action_popular"
         android:orderInCategory="1"
+        android:icon="@drawable/ic_popular"
         android:title="@string/menu_title_popular"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_top_rated"
         android:orderInCategory="2"
+        android:icon="@drawable/ic_star"
         android:title="@string/menu_title_top_rated"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 
     <item android:id="@+id/action_favorites"
+        android:icon="@drawable/ic_favorite_fill_dark"
         android:orderInCategory="3"
         android:title="@string/menu_title_favorites"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 
 </menu>
