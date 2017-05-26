@@ -1,7 +1,6 @@
 package com.node_coyote.popcinemaplus;
 
 import android.app.LoaderManager;
-import android.content.AsyncTaskLoader;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
@@ -67,8 +66,6 @@ public class MovieDetail extends AppCompatActivity
             MovieEntry.COLUMN_TRAILER,
             MovieEntry.COLUMN_FAVORITE,
             MovieEntry.COLUMN_REVIEW_SET
-//            MovieEntry.COLUMN_AUTHOR,
-//            MovieEntry.COLUMN_CONTENT
     };
 
     @Override
@@ -76,7 +73,6 @@ public class MovieDetail extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
 
-        mFavoritesClicked = true;
         // Get the intent from the grid item that was tapped
         Intent intent = getIntent();
         mCurrentMovieUri = intent.getData();
@@ -90,6 +86,27 @@ public class MovieDetail extends AppCompatActivity
         mMoviePosterView = (ImageView) findViewById(R.id.movie_detail_poster_image_view);
         noReviews = (TextView) findViewById(R.id.empty_reviews_view);
         ListView reviewList = (ListView) findViewById(R.id.reviews_list_view);
+
+        mReviews = new ArrayList<>();
+        mAdapter = new ReviewAdapter(this, mReviews);
+        reviewList.setAdapter(mAdapter);
+
+        if (checkForDatabase()) {
+            loadMovieData();
+        } else {
+            getLoaderManager().restartLoader(MOVIE_DETAIL_LOADER, null, this);
+        }
+
+        ImageButton playTrailerButton = (ImageButton) findViewById(R.id.watch_icon_button);
+        playTrailerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Uri firstTrailerResult = Uri.parse(mTrailerResults.get(0));
+                Intent trailerIntent = new Intent(Intent.ACTION_VIEW, firstTrailerResult);
+                startActivity(trailerIntent);
+            }
+        });
         mFavoritesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -106,47 +123,6 @@ public class MovieDetail extends AppCompatActivity
                 }
             }
         });
-        mReviews = new ArrayList<>();
-        mAdapter = new ReviewAdapter(this, mReviews);
-        reviewList.setAdapter(mAdapter);
-
-        ImageButton playTrailerButton = (ImageButton) findViewById(R.id.watch_icon_button);
-        playTrailerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Log.v("TRAILERBUTTON", mTrailerResults.get(0));
-                Uri y = Uri.parse(mTrailerResults.get(0));
-                Intent trailerIntent = new Intent(Intent.ACTION_VIEW, y);
-                startActivity(trailerIntent);
-            }
-        });
-
-        if (checkForDatabase()) {
-            loadMovieData();
-        } else {
-            getLoaderManager().restartLoader(MOVIE_DETAIL_LOADER, null, this);
-        }
-    }
-
-    private void favorite(int parameter) {
-        ContentValues contentValues = new ContentValues();
-
-        switch (parameter) {
-            case 0:
-                // Update to 0 False.
-                contentValues.put(MovieEntry.COLUMN_FAVORITE, 0);
-                getContentResolver().update(mCurrentMovieUri, contentValues, null, null);
-                break;
-            case 1:
-                // Update to 1 True.
-                contentValues.put(MovieEntry.COLUMN_FAVORITE, 1);
-                getContentResolver().update(mCurrentMovieUri, contentValues, null, null);
-                break;
-            default:
-                    throw new RuntimeException("Invalid favorites parameter");
-
-        }
     }
 
     /**
@@ -173,6 +149,26 @@ public class MovieDetail extends AppCompatActivity
         return empty;
     }
 
+    private void favorite(int parameter) {
+        ContentValues contentValues = new ContentValues();
+
+        switch (parameter) {
+            case 0:
+                // Update to 0 False.
+                contentValues.put(MovieEntry.COLUMN_FAVORITE, 0);
+                getContentResolver().update(mCurrentMovieUri, contentValues, null, null);
+                break;
+            case 1:
+                // Update to 1 True.
+                contentValues.put(MovieEntry.COLUMN_FAVORITE, 1);
+                getContentResolver().update(mCurrentMovieUri, contentValues, null, null);
+                break;
+            default:
+                throw new RuntimeException("Invalid favorites parameter");
+
+        }
+    }
+
     private void favoriteCheck(int isFavorite, String[] projection){
         switch (isFavorite) {
             case 0:
@@ -191,7 +187,6 @@ public class MovieDetail extends AppCompatActivity
                 getContentResolver().query(mCurrentMovieUri, projection, mCurrentMovieUri.toString().substring(51), null, null );
                 mFavoritesButton.setImageResource(R.drawable.ic_favorite_border);
                 break;
-
         }
     }
 
@@ -250,20 +245,9 @@ public class MovieDetail extends AppCompatActivity
             Picasso.with(mMoviePosterView.getContext()).load(baseImageUrl + posterPath).into(mMoviePosterView);
         }
 
-        // TODO save off COLUMN_TRAILER_SET
-//        mTrailerUrlSet = NetworkUtility.buildVideoDatasetUrl(String.valueOf(mMovieId));
-//        ContentValues values = new ContentValues();
-//        values.put(MovieEntry.COLUMN_TRAILER_SET, mTrailerUrlSet.toString());
-
-        // TODO save off at COLUMN_REVIEW_SET
-        //mReviewUrlSet = NetworkUtility.buildReviewDatasetUrl(String.valueOf(mMovieId));
-        //values.put(MovieEntry.COLUMN_REVIEW_SET, mReviewUrlSet.toString());
-        //getContentResolver().insert(MovieEntry.CONTENT_URI, values);
-
         new FetchReviewData().execute();
         new FetchTrailerData().execute();
         cursor.close();
-
     }
 
     @Override
@@ -278,11 +262,8 @@ public class MovieDetail extends AppCompatActivity
             mTrailerUrlSet = NetworkUtility.buildVideoDatasetUrl(String.valueOf(mMovieId));
 
             try {
-                Log.v("HELLSTRAIL", mTrailerUrlSet.toString());
-
                 String responseFromHttp = NetworkUtility.getResponseFromHttp(mTrailerUrlSet);
                 mTrailerResults = JsonUtility.getTrailerItemsFromJson(MovieDetail.this, responseFromHttp);
-
                 return mTrailerResults;
 
             } catch (Exception e) {
@@ -296,41 +277,21 @@ public class MovieDetail extends AppCompatActivity
 
         @Override
         protected List<Review> doInBackground(URL... params) {
-            new ReviewLoader(MovieDetail.this, mReviewUrlSet);
             mReviewUrlSet = NetworkUtility.buildReviewDatasetUrl(String.valueOf(mMovieId));
-            Log.v("backgrMOVIEID", String.valueOf(mMovieId));
             try {
                 String responseFromHttp = NetworkUtility.getResponseFromHttp(mReviewUrlSet);
                 mReviews = JsonUtility.getReviewItemsFromJson(responseFromHttp);
-                Log.v("REVIEW RESULTS", mReviews.toString());
-                if (mReviews != null && !mReviews.isEmpty()) {
-                    mAdapter.addAll(mReviews);
-                }
-                return mReviews;
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-    }
-
-
-    public class ReviewLoader extends AsyncTaskLoader<List<Review>> {
-
-        public ReviewLoader(Context context, URL url) {
-            super(context);
-            mReviewUrlSet = url;
-        }
-
-        @Override
-        public List<Review> loadInBackground() {
-
-            try {
-                Log.v("LOADINBackReviewurl", mReviewUrlSet.toString());
-                String responseFromHttp = NetworkUtility.getResponseFromHttp(mReviewUrlSet);
-                mReviews = JsonUtility.getReviewItemsFromJson(responseFromHttp);
-
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (mReviews != null && !mReviews.isEmpty()) {
+                            mAdapter.addAll(mReviews);
+                            noReviews.setVisibility(View.GONE);
+                        } else {
+                            noReviews.setVisibility(View.VISIBLE);
+                        }
+                    }
+                });
                 return mReviews;
 
             } catch (Exception e) {
@@ -339,9 +300,5 @@ public class MovieDetail extends AppCompatActivity
             }
         }
 
-        @Override
-        protected void onStartLoading(){
-            forceLoad();
-        }
     }
 }

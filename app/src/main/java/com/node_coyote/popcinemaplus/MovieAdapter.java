@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.node_coyote.popcinemaplus.data.MovieContract.MovieEntry;
 import com.squareup.picasso.Picasso;

@@ -20,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.node_coyote.popcinemaplus.data.MovieContract.MovieEntry;
@@ -48,6 +49,7 @@ public class MainActivity extends AppCompatActivity
      */
     private TextView mEmptyDisplay;
     private TextView mEmptyDisplaySubtext;
+    private Button mRetryButton;
 
     private ContentValues[] mMovieData;
     private int mPosition = RecyclerView.NO_POSITION;
@@ -83,7 +85,7 @@ public class MainActivity extends AppCompatActivity
 
         mEmptyDisplay = (TextView) findViewById(R.id.empty_screen_display);
         mEmptyDisplaySubtext = (TextView) findViewById(R.id.empty_screen_display_subtext);
-
+        mRetryButton = (Button) findViewById(R.id.retry_button);
         mRecyclerView = (RecyclerView) findViewById(R.id.movie_recycler_view);
         mRecyclerView.setHasFixedSize(true);
 
@@ -98,11 +100,15 @@ public class MainActivity extends AppCompatActivity
         //  Create a grid layout manager
         GridLayoutManager layoutManager = new GridLayoutManager(MainActivity.this, numberOfMovieColumns);
         mRecyclerView.setLayoutManager(layoutManager);
-
         mAdapter = new MovieAdapter(this);
-
         mRecyclerView.setAdapter(mAdapter);
 
+        mRetryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadMovieData();
+            }
+        });
     }
 
     /**
@@ -126,12 +132,10 @@ public class MainActivity extends AppCompatActivity
      * This one dismisses the items that show when there is no internet and replaces them with our roster.
      */
     private void showMovies() {
-        //mLoadingIndicator.setVisibility(View.INVISIBLE);
         mEmptyDisplay.setVisibility(View.INVISIBLE);
         mEmptyDisplaySubtext.setVisibility(View.INVISIBLE);
-        //mRetry.setVisibility(View.INVISIBLE);
+        mRetryButton.setVisibility(View.INVISIBLE);
         mRecyclerView.setVisibility(View.VISIBLE);
-
     }
 
     /**
@@ -141,6 +145,7 @@ public class MainActivity extends AppCompatActivity
     private void showLoadingIndicator() {
         mEmptyDisplay.setVisibility(View.VISIBLE);
         mEmptyDisplaySubtext.setVisibility(View.VISIBLE);
+        mRetryButton.setVisibility(View.VISIBLE);
         mRecyclerView.setVisibility(View.INVISIBLE);
     }
 
@@ -277,7 +282,7 @@ public class MainActivity extends AppCompatActivity
             URL popularMovieUrl = NetworkUtility.buildPopularMovieUrl();
 
             try {
-                // By default, the app opens with Popular Movies. It is up to the user to toggle to top rated
+                // By default, the app opens with Popular Movies. It is up to the user to toggle to top rated or favorites.
                 String jsonPopularMovieResponse = NetworkUtility.getResponseFromHttp(popularMovieUrl);
                 mMovieData = JsonUtility.getMovieStringsFromJson(MainActivity.this, jsonPopularMovieResponse);
 
@@ -293,7 +298,6 @@ public class MainActivity extends AppCompatActivity
         protected void onPostExecute(ContentValues[] movieData) {
 
             if (movieData != null) {
-                //mAdapter.swapCursor(movieData);
                 mAdapter.setMovieData(movieData);
                 showMovies();
             }
@@ -316,7 +320,7 @@ public class MainActivity extends AppCompatActivity
             URL topRatedMovieUrl = NetworkUtility.buildTopRatedMovieUrl();
 
             try {
-                // By default, the app opens with Popular Movies. It is up to the user to toggle to top rated
+                // By default, the app opens with Popular Movies. It is up to the user to toggle to top rated or favorites.
                 String jsonTopRatedResponse = NetworkUtility.getResponseFromHttp(topRatedMovieUrl);
                 mMovieData = JsonUtility.getMovieStringsFromJson(MainActivity.this, jsonTopRatedResponse);
                 return mMovieData;
@@ -331,7 +335,6 @@ public class MainActivity extends AppCompatActivity
         protected void onPostExecute(ContentValues[] topRatedMovieData) {
 
             if (topRatedMovieData != null) {
-                //mAdapter.swapCursor(topRatedMovieData);
                 mAdapter.setMovieData(topRatedMovieData);
             }
         }

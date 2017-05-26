@@ -12,7 +12,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by node_coyote on 5/2/17.
@@ -84,7 +83,6 @@ public final class JsonUtility {
         JSONArray results = root.getJSONArray(TRAILER_RESULTS);
 
         ArrayList<String> parsedTrailers = new ArrayList<>();
-        //ContentValues[] parsedTrailerValues = new ContentValues[results.length()];
 
         try {
 
@@ -96,19 +94,12 @@ public final class JsonUtility {
                 String newTrailer = YOUTUBE_BASE_URL + key;
 
                 parsedTrailers.add(newTrailer);
-                //ContentValues values = new ContentValues();
-                //values.put(MovieEntry.COLUMN_TRAILER, newTrailer);
-                //parsedTrailerValues[i] = values;
-                Log.v("parsedTraileVlues", newTrailer);
 
             }
         } catch (JSONException e) {
             Log.e("TrailerJSONUtility", "Problem parsing trailer json.");
         }
-
-        //context.getContentResolver().bulkInsert(MovieEntry.CONTENT_URI, parsedTrailerValues);
         return parsedTrailers;
-
     }
 
     public static ArrayList<Review> getReviewItemsFromJson(String reviewJsonString) throws JSONException {
@@ -120,8 +111,6 @@ public final class JsonUtility {
         JSONObject root = new JSONObject(reviewJsonString);
         JSONArray results = root.getJSONArray(REVIEW_RESULTS);
 
-        //ContentValues[] parsedReviewValues = new ContentValues[results.length()];
-
         ArrayList<Review> reviews = new ArrayList<>();
 
         try {
@@ -132,31 +121,13 @@ public final class JsonUtility {
 
                 String author = review.getString(AUTHOR);
                 String content = review.getString(CONTENT);
-                Log.v("JSOauthor", author);
-
-//                ContentValues values = new ContentValues();
-//                values.put(MovieEntry.COLUMN_AUTHOR, author);
-//                values.put(MovieEntry.COLUMN_CONTENT, content);
-//
-//                parsedReviewValues[i] = values;
                 Review newReview = new Review(author, content);
                 reviews.add(newReview);
             }
         } catch (JSONException e) {
             Log.e("ReviewJSONUtility", "Problem parsing Reviews");
         }
-
-        //context.getContentResolver().bulkInsert(MovieEntry.CONTENT_URI, parsedReviewValues);
         return reviews;
 
     }
-
-//    public static ContentValues getJsonReviews(Context context, String reviewString){
-//
-//        ContentValues values = new ContentValues();
-//        values.put(MovieEntry.COLUMN_REVIEW_SET, reviewString);
-//        context.getContentResolver().insert(MovieEntry.CONTENT_URI, values);
-//        return values;
-//    }
-
 }

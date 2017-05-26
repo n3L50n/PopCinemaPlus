@@ -17,7 +17,7 @@ public class MovieDatabaseHelper extends SQLiteOpenHelper {
     /**
      * This is the name of our database which will be saved locally on the user's device
      */
-    public static final String DATABASE_NAME = "movies.db";
+    private static final String DATABASE_NAME = "movies.db";
 
     /**
      * Increment this each time the database schema is changed.
@@ -28,7 +28,9 @@ public class MovieDatabaseHelper extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-
+    /**
+     * A string to create our movies database.
+     */
     private static final String SQL_CREATE_MOVIE_TABLE =
 
             "CREATE TABLE " + MovieEntry.TABLE_NAME + " ("
@@ -44,9 +46,6 @@ public class MovieDatabaseHelper extends SQLiteOpenHelper {
                     + MovieEntry.COLUMN_TRAILER + " TEXT, "
                     + MovieEntry.COLUMN_FAVORITE + " INTEGER NOT NULL DEFAULT 0, "
                     + MovieEntry.COLUMN_REVIEW_SET + " TEXT);";
-//                    + MovieEntry.COLUMN_AUTHOR + " TEXT, "
-//                    + MovieEntry.COLUMN_CONTENT + " TEXT);";
-
 
     /**
      * This is a required method override that can help us create a sql command to create
@@ -70,6 +69,12 @@ public class MovieDatabaseHelper extends SQLiteOpenHelper {
         onCreate(database);
     }
 
+    /**
+     * A method to help sort the movie grid posters according to popularity, rating, or favorites values.
+     * @param columns The specific column to be sorted.
+     * @param sortOrder Whether to sort ascending or descending.
+     * @return
+     */
     public Cursor getSortOrder(String[] columns, String sortOrder) {
 
         SQLiteQueryBuilder builder = new SQLiteQueryBuilder();

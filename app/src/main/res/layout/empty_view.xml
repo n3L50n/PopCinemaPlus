@@ -19,5 +19,8 @@
     <TextView
         android:id="@+id/empty_screen_display_subtext"
         style="@style/EmptyViewSubtextStyle" />
+    <Button
+        android:id="@+id/retry_button"
+        style="@style/RetryButtonStyle"/>
 
 </RelativeLayout>

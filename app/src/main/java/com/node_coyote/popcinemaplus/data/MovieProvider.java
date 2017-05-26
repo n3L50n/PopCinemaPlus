@@ -37,7 +37,6 @@ public class MovieProvider extends ContentProvider {
         sMatcher.addURI(MovieContract.CONTENT_AUTHORITY, MovieContract.PATH_MOVIE + "/#", MOVIE_ID);
     }
 
-
     // A database helper object.
     private MovieDatabaseHelper mHelper;
 
@@ -202,10 +201,10 @@ public class MovieProvider extends ContentProvider {
 
     /**
      * Let's use this method mainly to update Favorites values from 0 to 1 and vice versa.
-     * @param uri
-     * @param values
-     * @param selection
-     * @param selectionArgs
+     * @param uri The uri of the item to be favorited.
+     * @param values The value to be passed in, either 0 or 1.
+     * @param selection The selection which should always add an _ID
+     * @param selectionArgs The selection arguments.
      * @return
      */
     public int updateItem(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
