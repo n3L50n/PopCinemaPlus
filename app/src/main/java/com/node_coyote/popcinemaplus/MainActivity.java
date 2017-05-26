@@ -193,11 +193,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mAdapter.swapCursor(data);
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        mAdapter.swapCursor(cursor);
         if (mPosition == RecyclerView.NO_POSITION) mPosition = 0;
         mRecyclerView.smoothScrollToPosition(mPosition);
-        if (data.getCount() != 0) showMovies();
+        if (cursor.getCount() != 0) showMovies();
     }
 
     @Override
@@ -258,7 +258,7 @@ public class MainActivity extends AppCompatActivity
                 break;
         }
         MovieDatabaseHelper helper = new MovieDatabaseHelper(getApplicationContext());
-        mAdapter.swapCursor(helper.query(MOVIE_PROJECTION, sortOrder));
+        mAdapter.swapCursor(helper.getSortOrder(MOVIE_PROJECTION, sortOrder));
     }
 
     /**
@@ -296,7 +296,6 @@ public class MainActivity extends AppCompatActivity
                 //mAdapter.swapCursor(movieData);
                 mAdapter.setMovieData(movieData);
                 showMovies();
-                //loadExtras();
             }
         }
     }
@@ -337,40 +336,4 @@ public class MainActivity extends AppCompatActivity
             }
         }
     }
-
-//    /**
-//     * Class to help move the trailers and reviews request off the main thread
-//     */
-//    public class FetchTrailerReviewData extends AsyncTask<String, Void, ContentValues[]> {
-//
-//        @Override
-//        protected void onPreExecute() {
-//            super.onPreExecute();
-//        }
-//
-//        @Override
-//        protected ContentValues[] doInBackground(String... params) {
-//
-//            URL movieTrailersUrl = NetworkUtility.buildVideoDatasetUrl(MovieEntry.COLUMN_MOVIE_ID);
-//            URL movieReviewsUrl = NetworkUtility.buildReviewDatasetUrl(MovieEntry.COLUMN_MOVIE_ID);
-//
-//            try {
-//                String jsonTrailerResponse = NetworkUtility.getResponseFromHttp(movieTrailersUrl);
-//                String jsonReviewResponse = NetworkUtility.getResponseFromHttp(movieReviewsUrl);
-//                mMovieData = JsonUtility.getTrailerItemsFromJson(MainActivity.this, jsonTrailerResponse);
-//                mMovieData = JsonUtility.getReviewItemsFromJson(MainActivity.this, jsonReviewResponse);
-//
-//                return mMovieData;
-//
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                return null;
-//            }
-//        }
-//    }
-
-//    private void loadExtras() {
-//        new FetchTrailerReviewData().execute();
-//    }
-
 }

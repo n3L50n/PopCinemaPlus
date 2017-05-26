@@ -51,6 +51,8 @@ public class MovieDetail extends AppCompatActivity
     private TextView mMovieRatedTextView;
     private ImageView mMoviePosterView;
     private int mMovieId;
+    private boolean mFavoritesClicked;
+    private ImageButton mFavoritesButton;
 
     private static final int MOVIE_DETAIL_LOADER = 2;
 
@@ -76,6 +78,8 @@ public class MovieDetail extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
 
+        mFavoritesClicked = false;
+
         // Find movie Detail TextViews
         mMovieTitleTextView = (TextView) findViewById(R.id.movie_detail_title);
         mMovieSummaryTextView = (TextView) findViewById(R.id.movie_detail_summary);
@@ -84,6 +88,23 @@ public class MovieDetail extends AppCompatActivity
         mMoviePosterView = (ImageView) findViewById(R.id.movie_detail_poster_image_view);
         noReviews = (TextView) findViewById(R.id.empty_reviews_view);
         ListView reviewList = (ListView) findViewById(R.id.reviews_list_view);
+        mFavoritesButton = (ImageButton) findViewById(R.id.favorite_icon_button);
+        mFavoritesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (mFavoritesClicked) {
+                    favorite(1);
+                    mFavoritesButton.setImageResource(R.drawable.ic_favorite_fill);
+                    mFavoritesClicked = false;
+
+                } else {
+                    favorite(0);
+                    mFavoritesButton.setImageResource(R.drawable.ic_favorite_border);
+                    mFavoritesClicked = true;
+                }
+            }
+        });
         mReviews = new ArrayList<>();
         mAdapter = new ReviewAdapter(this, mReviews);
         reviewList.setAdapter(mAdapter);
@@ -91,6 +112,7 @@ public class MovieDetail extends AppCompatActivity
         // Get the intent from the grid item that was tapped
         Intent intent = getIntent();
         mCurrentMovieUri = intent.getData();
+        favoriteCheck();
 
         ImageButton playTrailerButton = (ImageButton) findViewById(R.id.watch_icon_button);
         playTrailerButton.setOnClickListener(new View.OnClickListener() {
@@ -112,6 +134,50 @@ public class MovieDetail extends AppCompatActivity
         }
     }
 
+    private void favoriteCheck(){
+
+        MovieDatabaseHelper helper = new MovieDatabaseHelper(this);
+        SQLiteDatabase database = helper.getReadableDatabase();
+        String check = "SELECT id, favorite FROM movies WHERE id = ?";
+        String[] args = new String[]{" " + mCurrentMovieUri.toString().substring(51)};
+        Log.v("FUCK", mCurrentMovieUri.toString().substring(51));
+        Cursor cursor = database.rawQuery(check, new String[]{mCurrentMovieUri.toString().substring(51)});
+
+        if (cursor != null && cursor.moveToFirst()) {
+            int index = cursor.getColumnIndex(MovieEntry.COLUMN_FAVORITE);
+            int isFavorite = cursor.getInt(index);
+            Log.v("Rinkl", String.valueOf(isFavorite));
+            switch (isFavorite) {
+                case 0:
+                    mFavoritesButton.setImageResource(R.drawable.ic_favorite_border);
+                case 1:
+                    mFavoritesButton.setImageResource(R.drawable.ic_favorite_fill);
+            }
+        }
+        cursor.close();
+    }
+
+    private void favorite(int parameter) {
+        ContentValues contentValues = new ContentValues();
+
+        switch (parameter) {
+            case 0:
+                // UPDATE to 0 False
+                contentValues.put(MovieEntry.COLUMN_FAVORITE, 0);
+                getContentResolver().update(mCurrentMovieUri, contentValues, null, null);
+                break;
+            case 1:
+                // UPdate to 1 True
+                contentValues.put(MovieEntry.COLUMN_FAVORITE, 1);
+                getContentResolver().update(mCurrentMovieUri, contentValues, null, null);
+                break;
+            default:
+                    throw new RuntimeException("Invalid favorites parameter");
+
+        }
+
+    }
+
     /**
      * A method to load movie data in the background
      */
@@ -119,7 +185,7 @@ public class MovieDetail extends AppCompatActivity
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
-
+            // TODO ideally load
             getLoaderManager().initLoader(MOVIE_DETAIL_LOADER, null, this);
         }
     }
@@ -212,6 +278,7 @@ public class MovieDetail extends AppCompatActivity
             mAdapter.addAll(mReviews);
         }
         new MovieDetail.FetchTrailerData().execute();
+        cursor.close();
 
     }
 

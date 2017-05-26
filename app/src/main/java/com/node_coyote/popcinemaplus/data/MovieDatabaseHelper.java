@@ -72,7 +72,7 @@ public class MovieDatabaseHelper extends SQLiteOpenHelper {
         onCreate(database);
     }
 
-    public Cursor query(String[] columns, String sortOrder) {
+    public Cursor getSortOrder(String[] columns, String sortOrder) {
 
         SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
         builder.setTables(MovieEntry.TABLE_NAME);
@@ -87,6 +87,22 @@ public class MovieDatabaseHelper extends SQLiteOpenHelper {
             return null;
         }
         return cursor;
-
     }
+
+//    public Cursor getFavorite(String[] columns ) {
+//
+//        SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
+//        builder.setTables(MovieEntry.TABLE_NAME);
+//
+//        Cursor cursor = builder.query(getReadableDatabase(), columns,
+//                null, null, null, null, null);
+//
+//        if (cursor == null) {
+//            return null;
+//        } else if (!cursor.moveToFirst()){
+//            cursor.close();
+//            return null;
+//        }
+//        return cursor;
+//    }
 }
