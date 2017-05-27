@@ -243,27 +243,32 @@ public class MainActivity extends AppCompatActivity
 
     private void sort(int parameter) {
 
-        String sortOrder = null;
+        MovieDatabaseHelper helper = new MovieDatabaseHelper(getApplicationContext());
+
+        String sortOrder;
         switch (parameter) {
             case SORT_POPULAR_MOVIES:
                 //query() popular
                 sortOrder = MovieEntry.COLUMN_POPULARITY + " DESC";
+                mAdapter.swapCursor(helper.getSortOrder(MOVIE_PROJECTION, sortOrder));
                 break;
             case SORT_TOP_RATED_MOVIES:
                 // query() top rated
                 sortOrder = MovieEntry.COLUMN_VOTE_AVERAGE + " DESC";
+                mAdapter.swapCursor(helper.getSortOrder(MOVIE_PROJECTION, sortOrder));
                 break;
             case SORT_FAVORITES:
                 // query() favorites
-                String[] projection = new String[]{"id, favorite"};
+                String selection = "favorite = 1";
                 sortOrder = MovieEntry.COLUMN_FAVORITE + " DESC";
-
-                getContentResolver().query(MovieEntry.CONTENT_URI, projection, " favorite=1", null, sortOrder );
-
+                mAdapter.swapCursor(getContentResolver().query(MovieEntry.CONTENT_URI, MOVIE_PROJECTION, selection, null, sortOrder));
                 break;
         }
-        MovieDatabaseHelper helper = new MovieDatabaseHelper(getApplicationContext());
-        mAdapter.swapCursor(helper.getSortOrder(MOVIE_PROJECTION, sortOrder));
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
     }
 
     /**
