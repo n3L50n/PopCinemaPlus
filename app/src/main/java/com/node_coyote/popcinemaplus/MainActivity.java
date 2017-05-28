@@ -13,6 +13,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -40,6 +41,9 @@ public class MainActivity extends AppCompatActivity
      */
     private RecyclerView mRecyclerView;
 
+    private GridLayoutManager mGridLayoutManager;
+    private Parcelable mLayoutState;
+
     /**
      * An adapter to populate the grid movie posters with popular movie posters
      */
@@ -60,6 +64,7 @@ public class MainActivity extends AppCompatActivity
      */
     private static final int MOVIE_LOADER = 42;
     private String SORT_KEY = "Current Sort";
+    private String LAYOUT_KEY = "Current State";
     private int CURRENT_SORT;
 
     private static final int SORT_POPULAR_MOVIES = 0;
@@ -104,8 +109,8 @@ public class MainActivity extends AppCompatActivity
         }
 
         //  Create a grid layout manager
-        GridLayoutManager layoutManager = new GridLayoutManager(MainActivity.this, numberOfMovieColumns);
-        mRecyclerView.setLayoutManager(layoutManager);
+        mGridLayoutManager = new GridLayoutManager(MainActivity.this, numberOfMovieColumns);
+        mRecyclerView.setLayoutManager(mGridLayoutManager);
         mAdapter = new MovieAdapter(this);
         mRecyclerView.setAdapter(mAdapter);
 
@@ -286,13 +291,27 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putInt(SORT_KEY, CURRENT_SORT);
+        mLayoutState = mGridLayoutManager.onSaveInstanceState();
+        outState.putParcelable(LAYOUT_KEY ,mLayoutState);
         super.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        CURRENT_SORT = savedInstanceState.getInt(SORT_KEY);
+        if (savedInstanceState != null){
+            mLayoutState = savedInstanceState.getParcelable(LAYOUT_KEY);
+            CURRENT_SORT = savedInstanceState.getInt(SORT_KEY);
+        }
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mLayoutState != null){
+            mGridLayoutManager.onRestoreInstanceState(mLayoutState);
+        }
     }
 
     /**
