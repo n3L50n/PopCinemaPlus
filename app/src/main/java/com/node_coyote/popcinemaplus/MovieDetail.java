@@ -75,8 +75,12 @@ public class MovieDetail extends AppCompatActivity
 
         // Get the intent from the grid item that was tapped
         Intent intent = getIntent();
-        mCurrentMovieUri = intent.getData();
+        if (intent != null) {
+            mCurrentMovieUri = intent.getData();
+        }
         mFavoritesButton = (ImageButton) findViewById(R.id.favorite_icon_button);
+
+        mFavoritesClicked = false;
 
         // Find movie Detail TextViews
         mMovieTitleTextView = (TextView) findViewById(R.id.movie_detail_title);
@@ -104,22 +108,24 @@ public class MovieDetail extends AppCompatActivity
 
                 Uri firstTrailerResult = Uri.parse(mTrailerResults.get(0));
                 Intent trailerIntent = new Intent(Intent.ACTION_VIEW, firstTrailerResult);
-                startActivity(trailerIntent);
+                if (trailerIntent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(trailerIntent);
+                }
             }
         });
         mFavoritesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                if (mFavoritesClicked) {
+                if (!mFavoritesClicked) {
                     favorite(1);
                     mFavoritesButton.setImageResource(R.drawable.ic_favorite_fill);
-                    mFavoritesClicked = false;
+                    mFavoritesClicked = true;
 
                 } else {
                     favorite(0);
                     mFavoritesButton.setImageResource(R.drawable.ic_favorite_border);
-                    mFavoritesClicked = true;
+                    mFavoritesClicked = false;
                 }
             }
         });
