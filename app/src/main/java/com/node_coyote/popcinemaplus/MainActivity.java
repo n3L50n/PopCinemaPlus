@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
@@ -16,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -58,6 +60,8 @@ public class MainActivity extends AppCompatActivity
      * Use as an arbitrary identifier for the movie loader data.
      */
     private static final int MOVIE_LOADER = 42;
+    private String SORT_KEY = "Current Sort";
+    private int CURRENT_SORT;
 
     private static final int SORT_POPULAR_MOVIES = 0;
     private static final int SORT_TOP_RATED_MOVIES = 1;
@@ -82,6 +86,9 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        if (savedInstanceState != null) {
+            CURRENT_SORT = savedInstanceState.getInt(SORT_KEY);
+        }
 
         mEmptyDisplay = (TextView) findViewById(R.id.empty_screen_display);
         mEmptyDisplaySubtext = (TextView) findViewById(R.id.empty_screen_display_subtext);
@@ -91,7 +98,7 @@ public class MainActivity extends AppCompatActivity
 
         int numberOfMovieColumns = 2;
 
-        if (checkforDatabase()) {
+        if (checkForDatabase()) {
             loadMovieData();
         } else {
             getLoaderManager().restartLoader(MOVIE_LOADER, null, this);
@@ -102,6 +109,13 @@ public class MainActivity extends AppCompatActivity
         mRecyclerView.setLayoutManager(layoutManager);
         mAdapter = new MovieAdapter(this);
         mRecyclerView.setAdapter(mAdapter);
+
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+            mRecyclerView.setLayoutManager(new GridLayoutManager(MainActivity.this, 2));
+        }
+        else{
+            mRecyclerView.setLayoutManager(new GridLayoutManager(MainActivity.this, 4));
+        }
 
         mRetryButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -154,7 +168,7 @@ public class MainActivity extends AppCompatActivity
      *
      * @return True if the database is empty and false if it exists.
      */
-    private boolean checkforDatabase() {
+    private boolean checkForDatabase() {
         boolean empty = true;
         MovieDatabaseHelper helper = new MovieDatabaseHelper(this);
         SQLiteDatabase database = helper.getReadableDatabase();
@@ -203,6 +217,7 @@ public class MainActivity extends AppCompatActivity
         if (mPosition == RecyclerView.NO_POSITION) mPosition = 0;
         mRecyclerView.smoothScrollToPosition(mPosition);
         if (cursor.getCount() != 0) showMovies();
+        sort(CURRENT_SORT);
     }
 
     @Override
@@ -248,16 +263,19 @@ public class MainActivity extends AppCompatActivity
         String sortOrder;
         switch (parameter) {
             case SORT_POPULAR_MOVIES:
+                CURRENT_SORT = SORT_POPULAR_MOVIES;
                 //query() popular
                 sortOrder = MovieEntry.COLUMN_POPULARITY + " DESC";
                 mAdapter.swapCursor(helper.getSortOrder(MOVIE_PROJECTION, sortOrder));
                 break;
             case SORT_TOP_RATED_MOVIES:
+                CURRENT_SORT = SORT_TOP_RATED_MOVIES;
                 // query() top rated
                 sortOrder = MovieEntry.COLUMN_VOTE_AVERAGE + " DESC";
                 mAdapter.swapCursor(helper.getSortOrder(MOVIE_PROJECTION, sortOrder));
                 break;
             case SORT_FAVORITES:
+                CURRENT_SORT = SORT_FAVORITES;
                 // query() favorites
                 String selection = "favorite = 1";
                 sortOrder = MovieEntry.COLUMN_FAVORITE + " DESC";
@@ -268,7 +286,14 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt(SORT_KEY, CURRENT_SORT);
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        CURRENT_SORT = savedInstanceState.getInt(SORT_KEY);
     }
 
     /**
