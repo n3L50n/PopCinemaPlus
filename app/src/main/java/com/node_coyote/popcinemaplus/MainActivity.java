@@ -18,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -57,7 +58,11 @@ public class MainActivity extends AppCompatActivity
     private Button mRetryButton;
 
     private ContentValues[] mMovieData;
-    private int mPosition = RecyclerView.NO_POSITION;
+    private int mGridPosition;
+    private int mNewPosition;
+    private Parcelable mState;
+    private String LAYOUT_SAVE = "Layout";
+    private String GRID_POSITION = "GridPosition";
 
     /**
      * Use as an arbitrary identifier for the movie loader data.
@@ -127,6 +132,7 @@ public class MainActivity extends AppCompatActivity
                 loadMovieData();
             }
         });
+        Log.v("onCreate", String.valueOf(mGridPosition));
     }
 
     /**
@@ -218,10 +224,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         mAdapter.swapCursor(cursor);
-        if (mPosition == RecyclerView.NO_POSITION) mPosition = 0;
-        mRecyclerView.smoothScrollToPosition(mPosition);
         if (cursor.getCount() != 0) showMovies();
         sort(CURRENT_SORT);
+        mGridLayoutManager.onRestoreInstanceState(mLayoutState);
+        mRecyclerView.getLayoutManager().onRestoreInstanceState(mState);
+        mRecyclerView.getLayoutManager().scrollToPosition(mNewPosition);
     }
 
     @Override
@@ -290,18 +297,28 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
         outState.putInt(SORT_KEY, CURRENT_SORT);
         mLayoutState = mGridLayoutManager.onSaveInstanceState();
         outState.putParcelable(LAYOUT_KEY ,mLayoutState);
-        super.onSaveInstanceState(outState);
+        outState.putParcelable(LAYOUT_SAVE, mRecyclerView.getLayoutManager().onSaveInstanceState());
+        mGridPosition = ((GridLayoutManager)mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition();
+        outState.putInt(GRID_POSITION, mGridPosition);
+
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         if (savedInstanceState != null){
+            mRecyclerView.getLayoutManager().scrollToPosition(mGridPosition);
+            mState = savedInstanceState.getParcelable(LAYOUT_SAVE);
             mLayoutState = savedInstanceState.getParcelable(LAYOUT_KEY);
             CURRENT_SORT = savedInstanceState.getInt(SORT_KEY);
+
+            mNewPosition = savedInstanceState.getInt(GRID_POSITION);
+            mRecyclerView.getLayoutManager().onRestoreInstanceState(mState);
+            mRecyclerView.getLayoutManager().scrollToPosition(mNewPosition);
         }
 
     }
@@ -311,8 +328,12 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
         if (mLayoutState != null){
             mGridLayoutManager.onRestoreInstanceState(mLayoutState);
+            mRecyclerView.getLayoutManager().onRestoreInstanceState(mState);
+            mRecyclerView.getLayoutManager().scrollToPosition(mGridPosition);
         }
     }
+
+
 
     /**
      * Class to help move the data request off the main thread

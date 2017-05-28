@@ -5,6 +5,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,12 +22,39 @@ import com.squareup.picasso.Picasso;
  * Created by node_coyote on 5/1/17.
  */
 
-public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHolder> {
+public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHolder> implements Parcelable {
 
     private ContentValues[] mMovieData;
     private Cursor mCursor;
 
-    private final MovieAdapterOnClickHandler mClickHandler;
+    private static MovieAdapterOnClickHandler mClickHandler = null;
+
+    protected MovieAdapter(Parcel in, MovieAdapterOnClickHandler mClickHandler) {
+        mMovieData = in.createTypedArray(ContentValues.CREATOR);
+        this.mClickHandler = mClickHandler;
+    }
+
+    public static final Creator<MovieAdapter> CREATOR = new Creator<MovieAdapter>() {
+        @Override
+        public MovieAdapter createFromParcel(Parcel in) {
+            return new MovieAdapter(in, mClickHandler);
+        }
+
+        @Override
+        public MovieAdapter[] newArray(int size) {
+            return new MovieAdapter[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeTypedArray(mMovieData, flags);
+    }
 
     /**
      * Interface to receive onClick messages
